@@ -28,6 +28,13 @@
     REDELIVERED 账簿证明设备重启后未执行且窗口仍有效，已重新派发
     EXPIRED     窗口关闭仍无法取得账簿证据，目标记 MISSED 后人工/系统关闭
     人工只能在没有执行事实的前提下 REDELIVER / 关闭，永远不能写入或覆盖事实。
+
+审计封存 (seal_request)::
+
+    安全角色为事件链设定区间 [from_id, to_id]，系统生成不可变封存包
+    （区间首尾 + 前序链头 + 末尾摘要 + 逐事件证明 + 整体摘要），
+    离线核验命令据此可在库被篡改/删记录/整库替换后定位首个断点。
+    同一区间至多一份有效申请；已封存内容不得覆盖；仅 PENDING 可撤销。
 """
 from __future__ import annotations
 
@@ -99,6 +106,32 @@ Q_NEVER_DISPATCHED = "NEVER_DISPATCHED"       # 网关从未投递（伪造/串�
 Q_STATE_SKIPPED = "TARGET_SKIPPED"            # 已撤销/拒绝/冻结
 Q_BOOT_MISMATCH = "BOOT_GENERATION_MISMATCH"  # 条目代次与投递代次不符（旧代次）
 Q_WINDOW_EXPIRED = "WINDOW_EXPIRED"           # 过期时限：事实不得补记，仅隔离留痕
+
+# ---- 审计封存（不可变封存包 + 离线核验）----
+# 封存申请状态机：
+#   PENDING 待处理（已登记区间，尚未开始写包；只有此状态可撤销）
+#   SEALING 生成中（已开始写包；崩溃后由重启恢复接管：要么续完同一份包，
+#           要么明确回滚为 PENDING 可重试，绝不留半成品/永久锁）
+#   SEALED 已封存（包已落盘并登记摘要；内容不得覆盖，只可核验）
+#   VERIFY_FAILED 核验失败（在线核验发现包/库不一致；保留证据，可复核验）
+#   CANCELLED 已撤销（仅 PENDING 可到达；撤销后同区间可重新申请）
+SEAL_PENDING = "PENDING"
+SEAL_SEALING = "SEALING"
+SEAL_SEALED = "SEALED"
+SEAL_VERIFY_FAILED = "VERIFY_FAILED"
+SEAL_CANCELLED = "CANCELLED"
+SEAL_ACTIVE = {SEAL_PENDING, SEAL_SEALING, SEAL_SEALED, SEAL_VERIFY_FAILED}
+
+# 封存处置历史事件类型（seal_events.kind，只追加）
+SEV_REQUESTED = "SEAL_REQUESTED"      # 安全角色登记封存申请
+SEV_STARTED = "SEAL_STARTED"          # 开始写包（PENDING→SEALING）
+SEV_COMPLETED = "SEAL_COMPLETED"      # 写包完成并登记摘要（SEALING→SEALED）
+SEV_FAILED = "SEAL_FAILED"            # 生成失败，回滚为可重试（SEALING→PENDING）
+SEV_CANCELLED = "SEAL_CANCELLED"      # 未开始写包的申请被撤销
+SEV_VERIFY_OK = "SEAL_VERIFY_OK"      # 在线核验通过
+SEV_VERIFY_FAILED = "SEAL_VERIFY_FAILED"  # 在线核验失败（首个断点见 detail）
+SEV_ROLLBACK = "SEAL_ROLLBACK"        # 重启恢复：生成中断，回滚为可重试
+SEV_ADOPTED = "SEAL_ADOPTED"          # 重启恢复：包已完整落盘，续完同一份包
 
 # 审计动作分类
 AUDIT_BIZ = "BIZ"

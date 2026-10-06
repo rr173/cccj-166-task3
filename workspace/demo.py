@@ -13,6 +13,8 @@
   8. 事故对账：坏签名/旧代次/编号缺口/指纹不符/矛盾记录全部隔离留痕；
      重复上送幂等；人工处置不能覆盖已确认执行事实
   9. 审计哈希链校验（含篡改检测）
+ 10. 审计封存与离线核验：区间封存包生成、重复申请幂等、仅待处理可撤销、
+     数据库被离线篡改/删记录/换历史后首个断点定位（在线核验与独立命令一致）
 """
 from __future__ import annotations
 
@@ -72,6 +74,7 @@ def main():
     tmp = tempfile.mkdtemp(prefix="gw-demo-")
     cfg = load_config(
         db_path=os.path.join(tmp, "gw.db"),
+        seal_dir=os.path.join(tmp, "seals"),
         biz_port=18090, sec_port=18091, dev_port=18092,
         default_valid_seconds=120, confirm_timeout_seconds=60,
         offline_seconds=4, sweep_interval=0.2)
@@ -249,7 +252,8 @@ def main():
     info("设备已执行并落盘，但回执在途时网关崩溃（不重放任何乐观状态）…")
     gw.stop()
     time.sleep(0.3)
-    cfg2 = load_config(db_path=cfg.db_path, biz_port=18090, sec_port=18091,
+    cfg2 = load_config(db_path=cfg.db_path, seal_dir=cfg.seal_dir,
+                       biz_port=18090, sec_port=18091,
                        dev_port=18092, default_valid_seconds=120,
                        confirm_timeout_seconds=60, offline_seconds=4,
                        sweep_interval=0.2)
@@ -388,6 +392,74 @@ def main():
     st, incs = call("GET", SEC + "/api/incidents?status=ALL", cookie=cookie)
     ok(f"对账工单 {len(incs['incidents'])} 张，工作台 /incidents 查看证据/冲突/处置历史")
     info("工作台: http://127.0.0.1:8081/login  (supervisor / S@fety-Confirm-7)")
+
+    # ---------------- 10 审计封存与离线核验 ----------------
+    hr("10. 审计封存：不可变封存包 + 离线核验定位首个断点")
+    st, audit = call("GET", SEC + "/api/audit?limit=1", cookie=cookie)
+    max_id = audit["chain"]["events"]
+    st, out = call("POST", SEC + "/api/seals", cookie=cookie,
+                   body={"from_id": 1, "to_id": max_id})
+    sid = out["seal"]["seal_id"]
+    ok(f"安全角色申请封存区间 [1, {max_id}] → {sid}（{out['seal']['status']} 待处理）")
+    st, dup = call("POST", SEC + "/api/seals", cookie=cookie,
+                   body={"from_id": 1, "to_id": max_id})
+    ok(f"同区间重复申请幂等：duplicate={dup['duplicate']}，仍返回 {dup['seal']['seal_id']}")
+
+    # 未开始写包的申请可以撤销；撤销后同区间可重新申请
+    st, out2 = call("POST", SEC + "/api/seals", cookie=cookie,
+                    body={"from_id": 2, "to_id": max_id})
+    sid2 = out2["seal"]["seal_id"]
+    st, cancelled = call("POST", f"{SEC}/api/seals/{sid2}/cancel", cookie=cookie,
+                         body={"reason": "区间选错，重新申请"})
+    ok(f"待处理申请可撤销 → {cancelled['status']}；已撤销区间可重新申请")
+
+    st, det = call("POST", f"{SEC}/api/seals/{sid}/generate", cookie=cookie, body={})
+    ok(f"生成封存包 → {det['status']}，事件数={det['event_count']}，"
+       f"包摘要={det['package_hash'][:20]}…")
+    st, pkg = call("GET", f"{SEC}/api/seals/{sid}/package", cookie=cookie)
+    info(f"包内容：区间 [{pkg['from_id']}, {pkg['to_id']}] + 前序链头 "
+         f"{pkg['prev_hash'][:12]}… + 末尾摘要 {pkg['end_hash'][:12]}… "
+         f"+ 逐事件证明 {len(pkg['events'])} 条")
+    st, out = call("POST", f"{SEC}/api/seals/{sid}/generate", cookie=cookie, body={})
+    bad(f"已封存后再次生成 → HTTP {st}（已封存内容不得覆盖）")
+    st, res = call("POST", f"{SEC}/api/seals/{sid}/verify", cookie=cookie, body={})
+    ok(f"在线核验：{res['verdict_label']}（与离线命令同一逻辑）")
+
+    info("模拟攻击：停网关 → 离线篡改数据库中间一条事件 → 重启核验…")
+    gw.stop()
+    time.sleep(0.3)
+    import sqlite3
+    conn = sqlite3.connect(cfg.db_path)
+    conn.execute("UPDATE events SET payload=? WHERE id=?", ('{"hacked":true}', 4))
+    conn.commit()
+    conn.close()
+    gw = Gateway(cfg2)
+    gw.start()
+    time.sleep(0.4)
+    cookie = login()
+    st, res = call("POST", f"{SEC}/api/seals/{sid}/verify", cookie=cookie, body={})
+    bad(f"在线核验：【{res['verdict_label']}】首个断点事件号="
+        f"{res['first_break']['event_id']}（{res['first_break']['reason'][:36]}…）")
+    st, lst = call("GET", SEC + "/api/seals?status=VERIFY_FAILED", cookie=cookie)
+    ok(f"工作台“核验失败”记录 {len(lst['seals'])} 条，处置历史全程留痕")
+
+    info("独立离线核验命令（不依赖网关进程，直接读包文件+库文件）：")
+    import subprocess, sys
+    proc = subprocess.run(
+        [sys.executable, "-m", "dual_gateway.seal_verify",
+         det["package_path"], "--db", cfg.db_path, "--json"],
+        capture_output=True, text=True)
+    off = json.loads(proc.stdout)
+    bad(f"python3 -m dual_gateway.seal_verify … → 退出码 {proc.returncode}，"
+        f"【{off['verdict_label']}】断点 #{off['first_break']['event_id']}（与在线一致）")
+
+    # 进一步：删除中间记录 → 数据库落后于封存
+    conn = sqlite3.connect(cfg.db_path)
+    conn.execute("DELETE FROM events WHERE id=?", (6,))
+    conn.commit()
+    conn.close()
+    st, res = call("POST", f"{SEC}/api/seals/{sid}/verify", cookie=cookie, body={})
+    bad(f"删除中间记录后：【{res['verdict_label']}】首个断点=#{res['first_break']['event_id']}")
 
     gw.stop()
     shutil.rmtree(tmp, ignore_errors=True)

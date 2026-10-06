@@ -15,6 +15,9 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import sqlite3
+import subprocess
+import sys
 import tempfile
 import time
 import unittest
@@ -24,7 +27,8 @@ import urllib.request
 from dual_gateway.app import Gateway
 from dual_gateway.config import load_config
 from dual_gateway.device_sim import SimDevice
-from dual_gateway.security import (hmac_sign, ledger_anchor, ledger_entry_hash,
+from dual_gateway.security import (GENESIS_HASH, event_hash, hmac_sign,
+                                   ledger_anchor, ledger_entry_hash,
                                    ledger_sign)
 
 
@@ -58,8 +62,9 @@ class E2EBase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp()
         self.db_path = os.path.join(self.tmp, "gw.db")
+        self.seal_dir = os.path.join(self.tmp, "seals")
         self.cfg = load_config(
-            db_path=self.db_path,
+            db_path=self.db_path, seal_dir=self.seal_dir,
             biz_host="127.0.0.1", biz_port=self.PORTS["biz"],
             sec_host="127.0.0.1", sec_port=self.PORTS["sec"],
             dev_host="127.0.0.1", dev_port=self.PORTS["dev"],
@@ -81,7 +86,7 @@ class E2EBase(unittest.TestCase):
         self.gw.stop()
         time.sleep(0.3)
         cfg = load_config(
-            db_path=self.db_path,
+            db_path=self.db_path, seal_dir=self.seal_dir,
             biz_host="127.0.0.1", biz_port=self.PORTS["biz"],
             sec_host="127.0.0.1", sec_port=self.PORTS["sec"],
             dev_host="127.0.0.1", dev_port=self.PORTS["dev"],
@@ -556,6 +561,218 @@ class TestIncidentWorkbench(E2EBase):
         st, detail, _ = _req("GET", f"{self.biz}/api/commands/{c['command_id']}",
                              token=self.cfg.biz_token)
         self.assertEqual(detail["targets"][0]["status"], "MISSED")
+
+
+class TestSealWorkbench(E2EBase):
+    """审计封存与离线核验端到端：真实三通道 HTTP + 进程级重启 + 离线改库。"""
+
+    def _make_events(self):
+        """创建并确认两条指令，让审计链长出若干事件，返回最大事件号。"""
+        cookie = self.sec_login()
+        for _ in range(2):
+            c = self.create(devices=("DEV-A1",))
+            self.confirm(c, cookie)
+        st, audit, _ = _req("GET", self.sec + "/api/audit?limit=1", cookie=cookie)
+        return audit["chain"]["events"], cookie
+
+    def _request_seal(self, cookie, from_id, to_id):
+        return _req("POST", self.sec + "/api/seals", cookie=cookie,
+                    body={"from_id": from_id, "to_id": to_id})
+
+    def test_seal_full_flow_via_api(self):
+        max_id, cookie = self._make_events()
+        # 申请 → PENDING
+        st, out, _ = self._request_seal(cookie, 1, max_id)
+        self.assertEqual(st, 201, out)
+        self.assertFalse(out["duplicate"])
+        sid = out["seal"]["seal_id"]
+        self.assertEqual(out["seal"]["status"], "PENDING")
+        # 重复申请返回原结果
+        st, dup, _ = self._request_seal(cookie, 1, max_id)
+        self.assertEqual(st, 200)
+        self.assertTrue(dup["duplicate"])
+        self.assertEqual(dup["seal"]["seal_id"], sid)
+        # 生成 → SEALED，包内容齐备
+        st, det, _ = _req("POST", f"{self.sec}/api/seals/{sid}/generate",
+                          cookie=cookie, body={})
+        self.assertEqual(st, 200, det)
+        self.assertEqual(det["status"], "SEALED")
+        self.assertEqual(det["event_count"], max_id)
+        # 已封存后重复生成/撤销都被拒（已封存内容不得覆盖）
+        st, out, _ = _req("POST", f"{self.sec}/api/seals/{sid}/generate",
+                          cookie=cookie, body={})
+        self.assertEqual(st, 409)
+        st, out, _ = _req("POST", f"{self.sec}/api/seals/{sid}/cancel",
+                          cookie=cookie, body={})
+        self.assertEqual(st, 409)
+        # 下载封存包：区间首尾/前序链头/末尾摘要/逐事件证明/整体摘要
+        st, pkg, _ = _req("GET", f"{self.sec}/api/seals/{sid}/package",
+                          cookie=cookie)
+        self.assertEqual(st, 200)
+        self.assertEqual(pkg["seal_id"], sid)
+        self.assertEqual(pkg["from_id"], 1)
+        self.assertEqual(pkg["to_id"], max_id)
+        self.assertEqual(len(pkg["events"]), max_id)
+        self.assertEqual(pkg["end_hash"], pkg["events"][-1]["hash"])
+        self.assertEqual(pkg["prev_hash"], pkg["events"][0]["prev_hash"])
+        # 在线核验通过
+        st, res, _ = _req("POST", f"{self.sec}/api/seals/{sid}/verify",
+                          cookie=cookie, body={})
+        self.assertEqual(st, 200)
+        self.assertTrue(res["ok"])
+        # 处置历史完整
+        st, det, _ = _req("GET", f"{self.sec}/api/seals/{sid}", cookie=cookie)
+        kinds = [e["kind"] for e in det["history"]]
+        self.assertEqual(kinds[:2], ["SEAL_REQUESTED", "SEAL_STARTED"])
+        self.assertIn("SEAL_COMPLETED", kinds)
+        self.assertIn("SEAL_VERIFY_OK", kinds)
+
+    def test_seal_rbac_and_channel_isolation(self):
+        max_id, cookie = self._make_events()
+        ro = self.sec_login("safety")
+        # 只读安全员：可看列表，不能申请/生成/撤销/核验
+        st, _, _ = _req("GET", self.sec + "/api/seals", cookie=ro)
+        self.assertEqual(st, 200)
+        st, out, _ = self._request_seal(ro, 1, max_id)
+        self.assertEqual(st, 403)
+        st, out, _ = self._request_seal(cookie, 1, max_id)
+        sid = out["seal"]["seal_id"]
+        for action in ("generate", "cancel", "verify"):
+            st, _, _ = _req("POST", f"{self.sec}/api/seals/{sid}/{action}",
+                            cookie=ro, body={})
+            self.assertEqual(st, 403, action)
+        # 未登录 401
+        st, _, _ = _req("GET", self.sec + "/api/seals")
+        self.assertEqual(st, 401)
+        # 业务通道没有封存路由
+        st, _, _ = _req("POST", self.biz + "/api/seals",
+                        token=self.cfg.biz_token,
+                        body={"from_id": 1, "to_id": max_id})
+        self.assertEqual(st, 404)
+
+    def test_seal_cancel_only_pending_via_api(self):
+        max_id, cookie = self._make_events()
+        st, out, _ = self._request_seal(cookie, 1, max_id)
+        sid = out["seal"]["seal_id"]
+        st, det, _ = _req("POST", f"{self.sec}/api/seals/{sid}/cancel",
+                          cookie=cookie, body={"reason": "区间选错"})
+        self.assertEqual(st, 200)
+        self.assertEqual(det["status"], "CANCELLED")
+        # 撤销后同区间可重新申请（未产生过封存结果）
+        st, out2, _ = self._request_seal(cookie, 1, max_id)
+        self.assertEqual(st, 201)
+        self.assertNotEqual(out2["seal"]["seal_id"], sid)
+
+    def test_offline_db_tamper_locates_first_break(self):
+        max_id, cookie = self._make_events()
+        st, out, _ = self._request_seal(cookie, 1, max_id)
+        sid = out["seal"]["seal_id"]
+        st, det, _ = _req("POST", f"{self.sec}/api/seals/{sid}/generate",
+                          cookie=cookie, body={})
+        pkg_path = det["package_path"]
+        # 停网关，离线篡改数据库中间一条记录
+        self.gw.stop()
+        time.sleep(0.3)
+        conn = sqlite3.connect(self.db_path)
+        conn.execute("UPDATE events SET payload=? WHERE id=?", ('{"hacked":1}', 3))
+        conn.commit()
+        conn.close()
+        # 重启后在线核验：定位首个断点，结论=库内容与封存不符
+        self.restart_gateway()
+        cookie = self.sec_login()
+        st, res, _ = _req("POST", f"{self.sec}/api/seals/{sid}/verify",
+                          cookie=cookie, body={})
+        self.assertEqual(st, 200, res)
+        self.assertFalse(res["ok"])
+        self.assertEqual(res["verdict"], "DB_DIVERGED")
+        self.assertEqual(res["first_break"]["event_id"], 3)
+        # 工作台记录进入“核验失败”
+        st, lst, _ = _req("GET", self.sec + "/api/seals?status=VERIFY_FAILED",
+                          cookie=cookie)
+        self.assertEqual([s["seal_id"] for s in lst["seals"]], [sid])
+        # 独立离线核验命令得出相同结论（不依赖网关进程）
+        proc = subprocess.run(
+            [sys.executable, "-m", "dual_gateway.seal_verify", pkg_path,
+             "--db", self.db_path, "--json"],
+            capture_output=True, text=True, cwd=_repo_root())
+        self.assertEqual(proc.returncode, 1, proc.stderr)
+        off = json.loads(proc.stdout)
+        self.assertEqual(off["verdict"], "DB_DIVERGED")
+        self.assertEqual(off["first_break"]["event_id"], 3)
+
+    def test_offline_delete_and_swap_history(self):
+        max_id, cookie = self._make_events()
+        st, out, _ = self._request_seal(cookie, 2, max_id)
+        sid = out["seal"]["seal_id"]
+        _req("POST", f"{self.sec}/api/seals/{sid}/generate", cookie=cookie,
+             body={})
+        # 离线删除区间内中间记录 → 数据库落后于封存
+        self.gw.stop()
+        time.sleep(0.3)
+        conn = sqlite3.connect(self.db_path)
+        conn.execute("DELETE FROM events WHERE id=?", (3,))
+        conn.commit()
+        conn.close()
+        self.restart_gateway()
+        cookie = self.sec_login()
+        st, res, _ = _req("POST", f"{self.sec}/api/seals/{sid}/verify",
+                          cookie=cookie, body={})
+        self.assertEqual(res["verdict"], "DB_LAGGING")
+        self.assertEqual(res["first_break"]["event_id"], 3)
+        # 整库换成另一份历史 → 前序历史不匹配
+        self.gw.stop()
+        time.sleep(0.3)
+        conn = sqlite3.connect(self.db_path)
+        conn.execute("DELETE FROM events")
+        prev = GENESIS_HASH
+        for i in range(1, max_id + 1):
+            payload = {"forged": i}
+            h = event_hash(prev, "FORGED", payload)
+            conn.execute(
+                "INSERT INTO events(id,ts,actor,channel,action,command_id,"
+                "device_id,payload,prev_hash,hash) VALUES(?,?,?,?,?,?,?,?,?,?)",
+                (i, 1000.0, "mallory", "SYSTEM", "FORGED", None, None,
+                 json.dumps(payload), prev, h))
+            prev = h
+        conn.commit()
+        conn.close()
+        self.restart_gateway()
+        cookie = self.sec_login()
+        st, res, _ = _req("POST", f"{self.sec}/api/seals/{sid}/verify",
+                          cookie=cookie, body={})
+        self.assertEqual(res["verdict"], "PRIOR_HISTORY_MISMATCH")
+        self.assertEqual(res["first_break"]["event_id"], 1)
+
+    def test_restart_during_generation_recovers(self):
+        max_id, cookie = self._make_events()
+        st, out, _ = self._request_seal(cookie, 1, max_id)
+        sid = out["seal"]["seal_id"]
+        # 模拟“生成中崩溃”：直接把记录改成 SEALING 后停网关
+        self.gw.stop()
+        time.sleep(0.3)
+        conn = sqlite3.connect(self.db_path)
+        conn.execute(
+            "UPDATE seal_requests SET status='SEALING',started_at=?,attempt=1,"
+            "package_path=? WHERE seal_id=?",
+            (time.time(), os.path.join(self.seal_dir, f"{sid}.json"), sid))
+        conn.commit()
+        conn.close()
+        # 重启：恢复必须明确回滚为可重试，不留半成品/永久锁
+        self.restart_gateway()
+        cookie = self.sec_login()
+        st, det, _ = _req("GET", f"{self.sec}/api/seals/{sid}", cookie=cookie)
+        self.assertEqual(det["status"], "PENDING")
+        self.assertIn("SEAL_ROLLBACK", [e["kind"] for e in det["history"]])
+        self.assertFalse(os.path.exists(det["package_path"] or ""))
+        # 可重试：重新生成成功
+        st, det, _ = _req("POST", f"{self.sec}/api/seals/{sid}/generate",
+                          cookie=cookie, body={})
+        self.assertEqual(st, 200)
+        self.assertEqual(det["status"], "SEALED")
+
+
+def _repo_root():
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 if __name__ == "__main__":

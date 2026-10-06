@@ -60,6 +60,8 @@ th{{color:#8fa3c6;font-weight:600}} code,.mono{{font-family:ui-monospace,Menlo,C
 .MISSED,.SKIPPED{{background:#2a2f3c;color:#9aa3b5}}
 .OPEN{{background:#4a2c10;color:#ffbd7f}} .RECOVERED{{background:#103a20;color:#7ff0ac}}
 .REDELIVERED{{background:#10304a;color:#7fc4ff}} .EXPIRED{{background:#333845;color:#aab2c5}}
+.SEALING{{background:#10304a;color:#7fc4ff}} .SEALED{{background:#103a20;color:#7ff0ac}}
+.VERIFY_FAILED{{background:#3d1620;color:#ff8ea3}} .CANCELLED{{background:#2a2f3c;color:#9aa3b5}}
 .qreason{{background:#3d1620;color:#ff8ea3;padding:1px 8px;border-radius:10px;font-size:12px}}
 input,textarea,select{{background:#0f1626;border:1px solid #31405f;color:#e6e9ef;border-radius:6px;padding:8px;margin:4px 0;width:320px}}
 button{{background:#2f6df6;color:#fff;border:0;border-radius:6px;padding:9px 18px;cursor:pointer;margin-right:8px}}
@@ -71,6 +73,7 @@ button.danger{{background:#c0394f}} button.gray{{background:#3a4358}}
 <a href="/workbench">待确认/在途指令</a><a href="/incidents">事故对账工单</a>
 <a href="/quarantine">账簿隔离区</a>
 <a href="/audit">审计事件链</a>
+<a href="/seals">审计封存</a>
 <a href="/receipts">回执审计</a><a href="/devices">设备状态</a>
 <span style="flex:1"></span><span class="muted">{user}</span>
 <a href="/logout">登出</a></header><main>{flash}{body}</main></body></html>"""
@@ -455,6 +458,222 @@ def audit_verify(h):
     h.redirect("/audit")
 
 
+# ---------------- 审计封存（不可变封存包 + 离线核验） ----------------
+_SEAL_STATUS_LABEL = {
+    "PENDING": "待处理", "SEALING": "生成中", "SEALED": "已封存",
+    "VERIFY_FAILED": "核验失败", "CANCELLED": "已撤销",
+}
+
+
+def _seal_tag(status: str) -> str:
+    return (f'<span class="tag {status}">'
+            f'{_SEAL_STATUS_LABEL.get(status, status)}</span>')
+
+
+@route("/seals", "GET")
+def seals_page(h):
+    s = _check_login(h)
+    q = h.query()
+    status = q.get("status") or "ALL"
+    seals = h.ctx.svc.list_seals(status=None if status == "ALL" else status)
+    max_id = h.ctx.svc.db.max_event_id() or 0
+    rows = []
+    for r in seals:
+        verify = "—"
+        if r["last_verify_at"]:
+            verify = (f'<span class="tag {"SEALED" if r["last_verify_ok"] else "VERIFY_FAILED"}">'
+                      f'{"通过" if r["last_verify_ok"] else "失败"}</span> '
+                      f'<span class="muted">{_ts(r["last_verify_at"])}</span>')
+        rows.append(
+            f'<tr><td class="mono"><a href="/seals/{r["seal_id"]}" '
+            f'style="color:#9db4d8">{r["seal_id"]}</a></td>'
+            f'<td class="mono">#{r["from_id"]} → #{r["to_id"]}</td>'
+            f'<td>{_seal_tag(r["status"])}</td>'
+            f'<td>{r["event_count"] if r["event_count"] is not None else "—"}</td>'
+            f'<td class="mono" title="{r.get("end_hash") or ""}">'
+            f'{(r.get("end_hash") or "—")[:12]}{"…" if r.get("end_hash") else ""}</td>'
+            f'<td>{html.escape(r["requested_by"])}</td>'
+            f'<td class="muted">{_ts(r["requested_at"])}</td>'
+            f'<td>{verify}</td></tr>')
+    tabs = " ".join(
+        f'<a href="/seals?status={k}" style="margin-right:12px">'
+        f'{"<b>" if status == k else ""}{v}{"</b>" if status == k else ""}</a>'
+        for k, v in [("PENDING", "待处理"), ("SEALING", "生成中"),
+                     ("SEALED", "已封存"), ("VERIFY_FAILED", "核验失败"),
+                     ("CANCELLED", "已撤销"), ("ALL", "全部")])
+    new_form = ""
+    if s["user"] == "supervisor":
+        new_form = f"""<div class="card"><h3>新封存申请</h3>
+        <p class="muted">对审计事件链的区间 [from, to] 生成不可变封存包
+        （当前已固化事件：1 … {max_id}）。同一区间只产生一份封存结果，重复申请返回原结果。</p>
+        <form method="post" action="/seals">
+          起始事件号 <input name="from_id" inputmode="numeric" style="width:120px" required>
+          末尾事件号 <input name="to_id" inputmode="numeric" style="width:120px" required>
+          <button type="submit">登记封存申请</button>
+        </form></div>"""
+    body = f"""{new_form}
+    <div class="card"><h3>审计封存记录</h3>
+    <p class="muted">{tabs}</p>
+    <table><tr><th>封存号</th><th>区间</th><th>状态</th><th>事件数</th>
+    <th>末尾摘要</th><th>申请人</th><th>申请时间</th><th>最近核验</th></tr>
+    {''.join(rows) or '<tr><td colspan=8 class=muted>暂无封存记录</td></tr>'}
+    </table></div>"""
+    _page(h, "审计封存", body)
+
+
+@route("/seals", "POST")
+def seal_create(h):
+    from urllib.parse import parse_qs
+    s = _require_role(h, "supervisor")
+    form = parse_qs(h._body().decode("utf-8"))
+    try:
+        out = h.ctx.svc.request_seal(
+            actor=s["user"],
+            from_id=(form.get("from_id") or [""])[0],
+            to_id=(form.get("to_id") or [""])[0])
+        h.redirect(f"/seals/{out['seal']['seal_id']}")
+    except Exception as exc:
+        _page(h, "审计封存", f'<div class="flash">{html.escape(str(exc))}</div>'
+                             f'<p><a href="/seals">返回封存列表</a></p>',
+              status=getattr(exc, "http_status", 400))
+
+
+@route("/seals/*/package.json", "GET")
+def seal_package_download(h):
+    _check_login(h)
+    seal_id = h.raw_path.split("/")[2]
+    pkg = h.ctx.svc.read_seal_package(seal_id)
+    h.send_json(pkg, extra_headers={
+        "Content-Disposition": f'attachment; filename="{seal_id}.json"'})
+
+
+@route("/seals/*", "GET")
+def seal_detail_page(h):
+    s = _check_login(h)
+    seal_id = h.raw_path.rsplit("/", 1)[-1]
+    r = h.ctx.svc.seal_detail(seal_id)
+
+    hist_rows = []
+    for ev in r["history"]:
+        hist_rows.append(
+            f'<tr><td class="mono">{_ts(ev["ts"])}</td>'
+            f'<td>{html.escape(ev["actor"])}</td><td><b>{ev["kind"]}</b></td>'
+            f'<td class="mono">{html.escape(str(ev["detail"]))[:400]}</td></tr>')
+
+    pkg_rows = []
+    pkg = r.get("package")
+    if pkg:
+        for e in pkg.get("events", [])[:200]:
+            pkg_rows.append(
+                f'<tr><td>{e["id"]}</td><td>{html.escape(str(e["action"]))}</td>'
+                f'<td>{html.escape(str(e["actor"]))}</td>'
+                f'<td class="mono" title="{e["hash"]}">{e["hash"][:12]}…</td></tr>')
+
+    action_box = ""
+    if s["user"] == "supervisor":
+        if r["status"] == "PENDING":
+            action_box = f"""
+            <div class="card"><h3>处置</h3>
+            <form method="post" action="/seals/{seal_id}/generate" style="display:inline">
+              <button type="submit">📦 生成封存包</button>
+            </form>
+            <form method="post" action="/seals/{seal_id}/cancel" style="display:inline"
+                  onsubmit="return confirm('撤销该封存申请？仅未开始写包的申请可撤销。')">
+              <input name="reason" placeholder="撤销原因" style="width:240px">
+              <button class="danger" type="submit">撤销申请</button>
+            </form>
+            {f'<p class="muted">上次错误：{html.escape(r["last_error"] or "")}</p>' if r.get("last_error") else ""}
+            </div>"""
+        elif r["status"] in ("SEALED", "VERIFY_FAILED"):
+            action_box = f"""
+            <div class="card"><h3>处置</h3>
+            <form method="post" action="/seals/{seal_id}/verify" style="display:inline">
+              <button type="submit">🔍 立即核验（与离线命令同一逻辑）</button>
+            </form>
+            <a href="/seals/{seal_id}/package.json"><button class="gray" type="button">⬇ 下载封存包</button></a>
+            <p class="muted">已封存内容不得覆盖；离线核验：
+            <code>python3 -m dual_gateway.seal_verify {seal_id}.json --db &lt;gateway.db&gt;</code></p>
+            </div>"""
+        elif r["status"] == "SEALING":
+            action_box = ('<div class="card muted">生成中：若服务重启，将自动续完同一份包'
+                          '或回滚为可重试，不留半成品。</div>')
+    elif r["status"] in ("PENDING", "SEALED", "VERIFY_FAILED"):
+        action_box = '<div class="card muted">只读账号：仅 supervisor 可处置</div>'
+
+    verify_info = "—"
+    if r["last_verify_at"]:
+        verify_info = (f'{"✅ 通过" if r["last_verify_ok"] else "❌ 失败"} '
+                       f'({_ts(r["last_verify_at"])})')
+    body = f"""<div class="card">
+      <h3>封存申请 {r["seal_id"]} {_seal_tag(r["status"])}</h3>
+      <table>
+      <tr><th>封存区间</th><td class="mono">#{r["from_id"]} → #{r["to_id"]}
+        （{r["event_count"] if r["event_count"] is not None else "—"} 个事件）</td></tr>
+      <tr><th>前序链头 prev_hash</th><td class="mono digest">{(r.get("prev_hash") or "—")}</td></tr>
+      <tr><th>末尾摘要 end_hash</th><td class="mono digest">{(r.get("end_hash") or "—")}</td></tr>
+      <tr><th>包整体摘要 package_hash</th><td class="mono digest">{(r.get("package_hash") or "—")}</td></tr>
+      <tr><th>申请 / 生成</th><td>{html.escape(r["requested_by"])} @ {_ts(r["requested_at"])}
+        / 第 {r["attempt"]} 次尝试，{_ts(r.get("sealed_at"))} 完成</td></tr>
+      <tr><th>包文件</th><td class="mono">{html.escape(r.get("package_path") or "—")}</td></tr>
+      <tr><th>最近核验</th><td>{verify_info}</td></tr>
+      {f'<tr><th>最近错误</th><td class="mono">{html.escape(r["last_error"])}</td></tr>' if r.get("last_error") else ""}
+      </table></div>
+      {action_box}
+      <div class="card"><h3>处置历史（只追加）</h3>
+      <table><tr><th>时间</th><th>主体</th><th>事件</th><th>内容</th></tr>
+      {''.join(hist_rows) or '<tr><td colspan=4 class=muted>暂无</td></tr>'}</table></div>
+      {f'''<div class="card"><h3>逐事件证明（包内 {len(pkg.get("events", []))} 条）</h3>
+      <table><tr><th>#</th><th>动作</th><th>主体</th><th>哈希</th></tr>
+      {''.join(pkg_rows)}</table></div>''' if pkg else ""}"""
+    _page(h, seal_id, body)
+
+
+def _seal_action(h, fn):
+    s = _require_role(h, "supervisor")
+    seal_id = h.raw_path.split("/")[2]
+    from urllib.parse import parse_qs
+    form = parse_qs(h._body().decode("utf-8"))
+    try:
+        return fn(s["user"], seal_id, form)
+    except Exception as exc:
+        _page(h, seal_id, f'<div class="flash">{html.escape(str(exc))}</div>'
+                          f'<p><a href="/seals/{seal_id}">返回封存记录</a></p>',
+              status=getattr(exc, "http_status", 400))
+        return None
+
+
+@route("/seals/*/generate", "POST")
+def seal_generate(h):
+    def _do(actor, seal_id, form):
+        h.ctx.svc.generate_seal(actor, seal_id)
+        h.redirect(f"/seals/{seal_id}")
+    _seal_action(h, _do)
+
+
+@route("/seals/*/cancel", "POST")
+def seal_cancel(h):
+    def _do(actor, seal_id, form):
+        h.ctx.svc.cancel_seal(actor, seal_id, (form.get("reason") or [""])[0])
+        h.redirect(f"/seals/{seal_id}")
+    _seal_action(h, _do)
+
+
+@route("/seals/*/verify", "POST")
+def seal_verify(h):
+    def _do(actor, seal_id, form):
+        result = h.ctx.svc.verify_seal(actor, seal_id)
+        if result["ok"]:
+            h.redirect(f"/seals/{seal_id}")
+        else:
+            fb = result.get("first_break") or {}
+            _page(h, seal_id,
+                  f'<div class="flash">核验失败【{html.escape(result["verdict_label"])}】'
+                  f'首个断点事件号={fb.get("event_id")}：'
+                  f'{html.escape(str(fb.get("reason")))}</div>'
+                  f'<p><a href="/seals/{seal_id}">返回封存记录</a></p>')
+    _seal_action(h, _do)
+
+
 @route("/receipts", "GET")
 def receipts_page(h):
     _check_login(h)
@@ -609,6 +828,61 @@ def api_incident_note(h):
 def api_quarantine(h):
     _check_login(h)
     h.send_json({"quarantined": h.ctx.svc.list_quarantine()})
+
+
+# ---------------- 审计封存 JSON 接口 ----------------
+@route("/api/seals", "POST")
+def api_seal_request(h):
+    s = _require_role(h, "supervisor")
+    body = h.read_json()
+    out = h.ctx.svc.request_seal(actor=s["user"], from_id=body.get("from_id"),
+                                 to_id=body.get("to_id"))
+    h.send_json(out, 200 if out["duplicate"] else 201)
+
+
+@route("/api/seals", "GET")
+def api_seal_list(h):
+    _check_login(h)
+    q = h.query()
+    status = q.get("status")
+    h.send_json({"seals": h.ctx.svc.list_seals(
+        status=None if status in (None, "ALL") else status)})
+
+
+@route("/api/seals/*/package", "GET")
+def api_seal_package(h):
+    _check_login(h)
+    seal_id = h.raw_path.split("/")[3]
+    h.send_json(h.ctx.svc.read_seal_package(seal_id))
+
+
+@route("/api/seals/*", "GET")
+def api_seal_detail(h):
+    _check_login(h)
+    seal_id = h.raw_path.rsplit("/", 1)[-1]
+    h.send_json(h.ctx.svc.seal_detail(seal_id))
+
+
+@route("/api/seals/*/generate", "POST")
+def api_seal_generate(h):
+    s = _require_role(h, "supervisor")
+    seal_id = h.raw_path.split("/")[3]
+    h.send_json(h.ctx.svc.generate_seal(s["user"], seal_id))
+
+
+@route("/api/seals/*/cancel", "POST")
+def api_seal_cancel(h):
+    s = _require_role(h, "supervisor")
+    seal_id = h.raw_path.split("/")[3]
+    body = h.read_json()
+    h.send_json(h.ctx.svc.cancel_seal(s["user"], seal_id, body.get("reason", "")))
+
+
+@route("/api/seals/*/verify", "POST")
+def api_seal_verify(h):
+    s = _require_role(h, "supervisor")
+    seal_id = h.raw_path.split("/")[3]
+    h.send_json(h.ctx.svc.verify_seal(s["user"], seal_id))
 
 
 @route("/healthz", "GET")

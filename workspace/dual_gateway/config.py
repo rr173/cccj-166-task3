@@ -57,6 +57,8 @@ class GatewayConfig:
 
     # —— 存储 ——
     db_path: str = field(default_factory=lambda: _env("GW_DB_PATH", "./data/gateway.db"))
+    # 审计封存包落盘目录（不可变 JSON 包 + 原子改名写入）
+    seal_dir: str = field(default_factory=lambda: _env("GW_SEAL_DIR", "./data/seals"))
     sweep_interval: float = field(
         default_factory=lambda: float(_env("GW_SWEEP_INTERVAL", "0.5")))
 

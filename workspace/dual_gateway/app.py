@@ -37,6 +37,11 @@ class Gateway:
             info = self.svc.startup_recovery()
             if info["doubt"]:
                 print(f"[gateway] 重启恢复：{info['doubt']} 个在途目标转 DOUBT，等待设备账本对账")
+            seals = info.get("seals") or {}
+            if any(seals.values()):
+                print(f"[gateway] 封存恢复：续完 {len(seals.get('adopted', []))} 份，"
+                      f"回滚可重试 {len(seals.get('rolled_back', []))} 份，"
+                      f"清理半成品 {len(seals.get('cleaned', []))} 份")
         self.biz.start()
         self.sec.start()
         self.dev.start()
