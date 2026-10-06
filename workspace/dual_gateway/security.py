@@ -119,3 +119,81 @@ def ledger_signature_valid(key: str, entries: list[dict], signature: str) -> boo
 def event_hash(prev_hash: str, event_type: str, payload: dict) -> str:
     body = canonical_json({"prev": prev_hash, "type": event_type, "payload": payload})
     return sha256_hex(body)
+
+
+def event_full_record_hash(event: dict) -> str:
+    """事件**全字段**记录摘要：把 ts/actor/channel/action/command_id/device_id/
+    payload/prev_hash/hash 全部绑定。
+
+    运行时哈希链 event_hash 只覆盖 (prev,action,payload)；封存用本摘要补齐对
+    actor/时间/通道等列的覆盖，使离线改任何一列都能被封存核验发现。封存构建、
+    包内自洽与前序历史重放三处共用同一规范化结构。
+    """
+    return sha256_hex(canonical_json({
+        "kind": "seal-event-record/v1",
+        "id": event["id"], "ts": event["ts"], "actor": event["actor"],
+        "channel": event["channel"], "action": event["action"],
+        "command_id": event.get("command_id"), "device_id": event.get("device_id"),
+        "payload": event["payload"], "prev_hash": event["prev_hash"],
+        "hash": event["hash"]}))
+
+
+# ---------------------------------------------------------------------------
+# 审计封存包（seal package）密码学
+#
+# 封存包由安全角色按事件区间（事件 id 区间）申请，内容自证且可离线核验：
+#
+#   proof_n = SHA256(canonical{event_id, prev_hash, action, payload_hash,
+#                              position, prev_proof})
+#
+# 每个事件的证明同时绑定事件自身字段、在区间内的位置与上一条证明，形成独立于
+# 数据库的“区间内证据链”；区间锚点绑定首尾事件 id/哈希、前序链头与末尾摘要，
+# 整包再用封存密钥 HMAC 签名。核验时无需任何在线服务与数据库写权限：
+# 仅读包 + 只读打开数据库即可定位首个断点并区分三类结果。
+# ---------------------------------------------------------------------------
+SEAL_DOMAIN = "gw-audit-seal/v1"
+
+SEAL_GENESIS_PROOF = "0" * 64
+
+
+def event_payload_hash(action: str, payload: Any) -> str:
+    """单条事件负载（动作 + canonical 负载）的摘要，用于逐事件证明。"""
+    return sha256_hex(canonical_json({"action": action, "payload": payload}))
+
+
+def seal_event_proof(position: int, event_id: int, record_hash: str,
+                     payload_hash: str, prev_proof: str) -> str:
+    return sha256_hex(canonical_json({
+        "kind": "seal-event-proof/v1", "position": position,
+        "event_id": event_id, "record_hash": record_hash,
+        "payload_hash": payload_hash, "prev_proof": prev_proof}))
+
+
+def seal_anchor(*, seal_id: str, created_by: str, from_id: int, to_id: int,
+                first_hash: str, last_hash: str, prior_head: str,
+                last_summary: str, count: int, proofs_head: str,
+                sealed_at: float) -> str:
+    """区间锚点：绑定区间首尾、前序链头、末尾摘要、事件数与逐事件证明链尾。"""
+    return sha256_hex(canonical_json({
+        "kind": "seal-anchor/v1", "seal_id": seal_id, "created_by": created_by,
+        "from_id": from_id, "to_id": to_id, "first_hash": first_hash,
+        "last_hash": last_hash, "prior_head": prior_head,
+        "last_summary": last_summary, "count": count,
+        "proofs_head": proofs_head, "sealed_at": sealed_at}))
+
+
+def seal_manifest_hash(manifest: dict) -> str:
+    """清单（不含 proofs/package_sig）指纹。"""
+    return sha256_hex(canonical_json(manifest))
+
+
+def seal_sign(seal_key: str, manifest: dict, proofs: list[dict]) -> str:
+    msg = (SEAL_DOMAIN + canonical_json({"manifest": manifest,
+                                         "proofs": proofs})).encode("utf-8")
+    return hmac.new(seal_key.encode("utf-8"), msg, hashlib.sha256).hexdigest()
+
+
+def seal_signature_valid(seal_key: str, manifest: dict, proofs: list[dict],
+                         signature: str) -> bool:
+    return hmac.compare_digest(seal_sign(seal_key, manifest, proofs),
+                               signature or "")

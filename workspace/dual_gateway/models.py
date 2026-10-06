@@ -105,3 +105,33 @@ AUDIT_BIZ = "BIZ"
 AUDIT_SEC = "SECURITY"
 AUDIT_DEV = "DEVICE"
 AUDIT_SYS = "SYSTEM"
+
+# ---- 审计封存（seal）----
+# 状态机：
+#   PENDING  已受理、尚未开始写包（唯一允许撤销的状态；重复申请幂等返回原结果）
+#   SEALING  正在生成封存包；服务重启后要么续写完成，要么回滚为 PENDING 可重试，
+#            绝不留下半成品或永久锁
+#   SEALED   封存完成，封存包不可变，记录不得覆盖
+#   FAILED   生成失败并已回滚为可重试（重新申请即原区间上的新一次尝试）
+#   CANCELED 未开始写包即被安全角色撤销
+SEAL_PENDING = "PENDING"
+SEAL_SEALING = "SEALING"
+SEAL_SEALED = "SEALED"
+SEAL_FAILED = "FAILED"
+SEAL_CANCELED = "CANCELED"
+SEAL_ACTIVE = {SEAL_PENDING, SEAL_SEALING}
+
+# 离线核验结论
+VR_OK = "OK"                       # 包自洽且与数据库完全一致
+VR_PACKAGE_CORRUPT = "PACKAGE_CORRUPT"   # 包内损坏（签名/逐事件证明/首尾）
+VR_HISTORY_MISMATCH = "HISTORY_MISMATCH"  # 前序历史不匹配（换入另一份历史）
+VR_DB_BEHIND = "DB_BEHIND"         # 数据库落后于封存（封存点之后的记录缺失）
+
+# 封存处置历史事件类型
+SEV_REQUESTED = "SEAL_REQUESTED"
+SEV_STARTED = "SEAL_STARTED"
+SEV_COMPLETED = "SEAL_COMPLETED"
+SEV_FAILED = "SEAL_FAILED"
+SEV_CANCELED = "SEAL_CANCELED"
+SEV_RESUMED = "SEAL_RESUMED_ON_RESTART"
+SEV_VERIFIED = "SEAL_VERIFICATION_RECORDED"

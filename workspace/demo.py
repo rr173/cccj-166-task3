@@ -387,7 +387,34 @@ def main():
     ok(f"被拒绝回执留痕 {len(rej['rejected'])} 条（旧代号/跳号/复用/伪造可逐条追溯）")
     st, incs = call("GET", SEC + "/api/incidents?status=ALL", cookie=cookie)
     ok(f"对账工单 {len(incs['incidents'])} 张，工作台 /incidents 查看证据/冲突/处置历史")
-    info("工作台: http://127.0.0.1:8081/login  (supervisor / S@fety-Confirm-7)")
+
+    hr("10. 审计封存与离线核验")
+    from dual_gateway import sealing
+    import sqlite3
+    st, s1 = call("POST", SEC + "/api/seals", cookie=cookie, body={})
+    ok(f"申请封存全区间 1..{s1['to_id']}：{s1['status']}，封存 {s1['event_count']} 条事件")
+    sid = s1["seal_id"]
+    st, s2 = call("POST", SEC + "/api/seals", cookie=cookie,
+                  body={"from_id": 1, "to_id": s1["to_id"]})
+    ok(f"同区间重复申请返回同一份：{s2['seal_id'] == sid}（不产生第二份）")
+    st, ver = call("POST", SEC + f"/api/seals/{sid}/verify", cookie=cookie, body={})
+    ok(f"在线核验：{ver['result']}")
+    pkg_path, db_path = s1["package_path"], cfg.db_path
+    r = sealing.verify_offline(pkg_path, db_path, cfg.seal_key)
+    ok(f"离线核验原始库：{r['result']}（链尾 {r['head'][:16]}…）")
+    # 离线删除中间记录
+    time.sleep(0.2)
+    conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    mid = max(1, s1["to_id"] // 2)
+    conn.execute("DELETE FROM events WHERE id=?", (mid,))
+    conn.commit(); conn.close()
+    r = sealing.verify_offline(pkg_path, db_path, cfg.seal_key)
+    bad(f"删除中间事件 {mid} 后离线核验：{r['result']}，"
+        f"首个断点 事件 {r['break_at']['event_id']}（{r['break_at']['stage']}）")
+    info("独立命令（只读、无需启动网关）：")
+    info(f"  python3 -m dual_gateway.verify_seal {pkg_path} {db_path} --json")
+    info("工作台 /seals：待处理/生成中/已封存/核验失败 与处置历史；已封存不可覆盖")
 
     gw.stop()
     shutil.rmtree(tmp, ignore_errors=True)

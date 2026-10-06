@@ -5,7 +5,7 @@
 **启动代号（boot_code）+ 严格递增序号（seq）**，所有状态变迁写入
 **append-only 哈希链审计日志**。
 
-> 纯 Python 3 标准库实现，无任何第三方依赖。62 个测试（44 单元 + 18 端到端）全部通过。
+> 纯 Python 3 标准库实现，无任何第三方依赖。99 个测试（80 单元 + 19 端到端）全部通过。
 
 ## 一、安全模型（如何对应需求）
 
@@ -24,7 +24,10 @@
 | 重复上送幂等 / 隔离区 | 同一设备同一册（内容+上送代次）重复上送按幂等回放，不重复补记/隔离/派发；编号缺口、序号复用、断链、指纹不符、事实矛盾、未投递伪造、旧代次、过期时限、坏签名全部进入 `quarantined_ledger` 隔离区永久留痕 |
 | 已执行事实不能被撤销覆盖 | `receipts` 表 `(command_id, device_id)` 唯一，目标终态 UPDATE 仅允许从在途态结算，终态之间互不可写；撤销接口对存在执行事实的指令硬性拒绝；过期后到达的账簿也只能隔离，不能把 MISSED/SKIPPED 翻成执行 |
 | 设备离线恢复 | 心跳超时置离线，离线设备 PULL 被拒；窗口内上线正常投递；窗口结束仍未投递记 `MISSED` 且事后上线也不再给指令 |
-| 审计 | 所有变迁先在同一事务写 `events` 全序哈希链 `hash_n = SHA256(hash_{n-1}‖action‖payload)`；工作台可一键重放校验，篡改任意一条即断链；被拒回执单独留痕 |
+| 审计 | 所有变迁先在同一事务写 `events` 全序哈希链 `hash_n = SHA256(hash_{n-1}‖action‖payload)`；每条事件另存绑定全列（时间/主体/通道/动作/负载/链指针）的 `full_record_hash`；工作台可一键重放校验，篡改任意一条即断链；被拒回执单独留痕 |
+| 审计封存 | 安全角色按事件 id 区间生成**不可变封存包**（区间首尾、前序链头、末尾摘要、逐事件证明 + 区间锚点 + 整包 HMAC），原子落盘；同区间并发/重复申请只产生一份结果，重复申请返回原结果 |
+| 封存重启语义 | 生成中重启后自动**续写完成同一份包**（内容由区间事件完全决定），生成失败明确回滚为 FAILED 可重试；临时文件启动即清，绝不留半成品或永久锁；已封存不可覆盖，只有未开始写包的 PENDING 申请可撤销 |
+| 离线核验 | 独立命令 `python3 -m dual_gateway.verify_seal <包> <db>` **只读**打开数据库，定位**首个断点**并三分类：`PACKAGE_CORRUPT`（包内损坏）/ `HISTORY_MISMATCH`（前序历史不匹配、换入另一份历史）/ `DB_BEHIND`（数据库落后于封存、删中间记录或回滚） |
 
 状态机见 `dual_gateway/models.py` 顶部注释。
 
@@ -48,7 +51,9 @@
                             rejected_receipts / device_boots /
                             incidents / incident_events /
                             quarantined_ledger / ledger_uploads /
-                            events (哈希链) / devices
+                            events (哈希链+全字段摘要) /
+                            seal_requests / seal_events / devices
+                            seals/ 目录：不可变封存包 *.seal.json
 ```
 
 关键恢复语义：设备侧模拟器（`device_sim.py`）遵循真实 PLC 做法——
@@ -93,8 +98,59 @@ curl -s -X POST http://127.0.0.1:8080/api/commands \
 
 # 5. 第二角色在工作台输入确认码并复核摘要后确认；设备自动拉取执行并回执
 # 6. 审计：工作台 /incidents（事故对账工单）、/quarantine（账簿隔离区）、
-#    /audit（哈希链校验）、/receipts（接受/拒绝回执）
+#    /audit（哈希链校验）、/receipts（接受/拒绝回执）、/seals（审计封存）
 ```
+
+## 三·五、审计封存与离线核验
+
+安全角色（工作台 **/seals**，supervisor 可申请/撤销、safety 只读但可核验）按
+**事件 id 区间**申请封存；区间留空表示封存当前全部事件。封存包
+（`seals/<SEAL-ID>.seal.json`）是自描述、自证的 JSON：
+
+```
+manifest   版本 / seal_id / 申请人 / 区间 from_id..to_id / prior_head（前序链头）/
+           first_hash / last_hash（区间首尾）/ last_summary（末尾摘要）/
+           count / proofs_head / anchor（区间锚点）/ sealed_at
+events[]   区间内事件的完整全字段记录
+proofs[]   逐事件证明 proof_n = SHA256(canonical{
+               position, event_id, record_hash=全字段记录摘要,
+               payload_hash, prev_proof})
+manifest_hash / package_sig = HMAC-SHA256(seal_key, "gw-audit-seal/v1"‖manifest‖proofs)
+```
+
+- **同区间并发安全**：`seal_requests` 上对 `(from_id,to_id)` 的部分唯一索引 +
+  服务内单锁，重复/并发申请幂等返回**同一份**结果；`PENDING→SEALING` 的条件
+  UPDATE 保证只有一个执行者真正写包。
+- **重启不留半成品/永久锁**：包以“同目录临时文件 + `os.replace`”原子落盘；
+  启动时清理 `*.tmp`，对仍处 SEALING 的申请**续写完成同一份包**（封存内容只
+  取决于区间事件与密钥），写包失败则明确回滚为 FAILED（同区间可重新申请）。
+- **不可覆盖 / 撤销边界**：SEALED 记录与包文件不可改；撤销只允许在尚未开始写
+  包的 PENDING 阶段，SEALING/SEALED 一律拒绝。
+- **工作台**：按 待处理(PENDING) / 生成中(SEALING) / 已封存(SEALED) /
+  核验失败(VERIFY_FAILED，派生视图) 展示，详情页给出处置历史（只追加：
+  申请/开始/完成/失败/重启续写/撤销/每次核验结论）、锚点与包指纹，可下载封存包。
+
+### 独立离线核验命令（不启动网关、不写数据库）
+
+```bash
+python3 -m dual_gateway.verify_seal seals/SEAL-xxxx.seal.json data/gateway.db
+# 仅包内自洽核验（取证机无库）：加 --self-only
+# 机器可读：加 --json
+# 退出码：0=OK 2=PACKAGE_CORRUPT 3=HISTORY_MISMATCH 4=DB_BEHIND
+```
+
+核验顺序固定，报告**首个断点**（位置/事件 id/阶段）：
+
+| 结论 | 含义 | 典型断点阶段 |
+|---|---|---|
+| `OK` | 包自洽且与数据库一致（库在封存点之后继续增长也算一致） | — |
+| `PACKAGE_CORRUPT` | 包内损坏：签名/清单哈希/逐事件证明/原哈希链/区间锚点 | `signature` `record_hash` `proof` `chain_hash` `anchor` |
+| `HISTORY_MISMATCH` | 前序历史不匹配：从创世重放封存点之前的前缀，链尾不等于 `prior_head`，即换入另一份历史 | `prior_head` `prior_record` `prior_event_missing` |
+| `DB_BEHIND` | 数据库落后于封存：区间内事件被删/回滚（缺失）或同 id 记录被离线改写 | `event_missing` `event_content` |
+
+在线核验入口 `POST /api/seals/{id}/verify`（安全通道，只读比对）会把结论追加
+到处置历史并可在“核验失败”页签查看，但**核验失败不改变封存结果本身**。
+
 
 一键观看全部攻击/故障场景（撤销边界、超时、旧代号、乱序、序号复用、
 网关崩溃+回执丢失、设备重启、离线恢复、坏签名/指纹/缺口账簿隔离、
@@ -126,6 +182,7 @@ python3 demo.py
 
 ```bash
 python3 -m unittest tests.test_service -v   # 领域规则单元测试（含工单/账簿五重校验）
+python3 -m unittest tests.test_seals   -v   # 审计封存/重启恢复/离线核验三分类
 python3 -m unittest tests.test_e2e    -v   # 真实三端口 HTTP + 进程级重启端到端
 ```
 
@@ -135,4 +192,6 @@ python3 -m unittest tests.test_e2e    -v   # 真实三端口 HTTP + 进程级重
 - 设备密钥经 KMS/烧录下发并支持轮换；确认码接真实带外通道（硬令牌/语音）；
 - SQLite 可替换为 Postgres（接口已集中在 `storage.py`），多实例时用其行锁/SELECT FOR UPDATE；
 - 工作台前置于企业 SSO + 强 MFA，会话 Cookie 加 Secure；
-- 审计事件链增加每日锚点（发布到独立 WORM/时间戳服务），防止整库离线篡改。
+- 审计事件链增加每日锚点（发布到独立 WORM/时间戳服务），防止整库离线篡改；
+  封存密钥 `GW_SEAL_KEY` 应由 KMS 注入并定期轮换（离线核验方需持有对应密钥），
+  封存包建议复制到只读/WORM 介质或带外归档，避免与被审数据库同生共死。

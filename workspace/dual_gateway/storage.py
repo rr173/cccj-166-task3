@@ -15,7 +15,7 @@ import json
 import sqlite3
 from typing import Any, Optional
 
-from .security import GENESIS_HASH, event_hash
+from .security import GENESIS_HASH, event_full_record_hash, event_hash
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS meta (
@@ -164,7 +164,8 @@ CREATE TABLE IF NOT EXISTS events (
     device_id TEXT,
     payload   TEXT NOT NULL,
     prev_hash TEXT NOT NULL,
-    hash      TEXT NOT NULL UNIQUE
+    hash      TEXT NOT NULL UNIQUE,
+    full_record_hash TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_targets_device ON targets(device_id, status);
@@ -177,6 +178,45 @@ CREATE INDEX IF NOT EXISTS idx_incidents_device ON incidents(device_id);
 CREATE INDEX IF NOT EXISTS idx_iev_incident ON incident_events(incident_id, id);
 CREATE INDEX IF NOT EXISTS idx_quarantine_device ON quarantined_ledger(device_id);
 CREATE INDEX IF NOT EXISTS idx_quarantine_incident ON quarantined_ledger(incident_id);
+
+-- 审计封存申请：同一事件区间只能存在一份“生效中/已封存”的结果
+CREATE TABLE IF NOT EXISTS seal_requests (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    seal_id      TEXT NOT NULL UNIQUE,
+    from_id      INTEGER NOT NULL,        -- 区间首事件 id（含）
+    to_id        INTEGER NOT NULL,        -- 区间尾事件 id（含，申请时为当前链尾）
+    status       TEXT NOT NULL,           -- PENDING/SEALING/SEALED/FAILED/CANCELED
+    created_by   TEXT NOT NULL,
+    created_at   REAL NOT NULL,
+    updated_at   REAL NOT NULL,
+    sealed_at    REAL,
+    prior_head   TEXT,                    -- from_id-1 的链头（GENESIS 或事件哈希）
+    first_hash   TEXT,
+    last_hash    TEXT,                    -- 末尾摘要
+    event_count  INTEGER,
+    package_path TEXT,                    -- 封存包文件（原子落盘）
+    package_hash TEXT,                    -- 整包文件 SHA-256
+    package_sig  TEXT,                    -- 封存密钥 HMAC
+    anchor       TEXT,                    -- 区间锚点
+    fail_reason  TEXT
+);
+
+-- 同区间并发申请去重：任意 (from_id,to_id) 只允许一条未终结记录
+CREATE UNIQUE INDEX IF NOT EXISTS idx_seal_range_unique
+    ON seal_requests(from_id, to_id)
+    WHERE status IN ('PENDING','SEALING','SEALED');
+
+-- 封存处置历史（申请/开始写包/完成/失败回滚/重启续写/撤销/核验结果），只追加
+CREATE TABLE IF NOT EXISTS seal_events (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    seal_id     TEXT NOT NULL,
+    ts          REAL NOT NULL,
+    actor       TEXT NOT NULL,            -- system / 安全角色账号
+    kind        TEXT NOT NULL,
+    detail      TEXT NOT NULL,            -- JSON
+    audit_event_id INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_seal_events ON seal_events(seal_id, id);
 """
 
 
@@ -186,6 +226,7 @@ def _column_names(conn, table: str) -> set[str]:
 
 class Storage:
     def __init__(self, db_path: str):
+        self.db_path = db_path
         if db_path != ":memory:":
             import os
             os.makedirs(os.path.dirname(os.path.abspath(db_path)) or ".", exist_ok=True)
@@ -199,12 +240,25 @@ class Storage:
         self.conn.commit()
 
     def _migrate(self):
-        """旧库补列（receipts 增加账簿链式证据字段），新库已是最新。"""
+        """旧库补列（receipts 账簿证据字段、events 全字段记录摘要），新库最新。"""
         cols = _column_names(self.conn, "receipts")
         if "entry_hash" not in cols:
             self.conn.execute("ALTER TABLE receipts ADD COLUMN entry_hash TEXT")
         if "prev_hash" not in cols:
             self.conn.execute("ALTER TABLE receipts ADD COLUMN prev_hash TEXT")
+        ecols = _column_names(self.conn, "events")
+        if "full_record_hash" not in ecols:
+            self.conn.execute("ALTER TABLE events ADD COLUMN full_record_hash TEXT")
+            self._backfill_event_record_hashes()
+
+    def _backfill_event_record_hashes(self):
+        """为旧库既有事件补齐全字段记录摘要（按链顺序幂等重算）。"""
+        rows = self.conn.execute("SELECT * FROM events ORDER BY id").fetchall()
+        for r in rows:
+            d = dict(r)
+            self.conn.execute(
+                "UPDATE events SET full_record_hash=? WHERE id=?",
+                (event_full_record_hash(d), d["id"]))
 
     def close(self):
         self.conn.close()
@@ -232,12 +286,21 @@ class Storage:
         row = cur.fetchone()
         prev = row["hash"] if row else GENESIS_HASH
         h = event_hash(prev, action, payload)
+        payload_text = json.dumps(payload, ensure_ascii=False, sort_keys=True)
         cur = self.conn.execute(
             "INSERT INTO events(ts,actor,channel,action,command_id,device_id,"
             "payload,prev_hash,hash) VALUES(?,?,?,?,?,?,?,?,?)",
             (ts, actor, channel, action, command_id, device_id,
-             json.dumps(payload, ensure_ascii=False, sort_keys=True), prev, h))
-        return cur.lastrowid
+             payload_text, prev, h))
+        event_id = cur.lastrowid
+        # 全字段记录摘要（含 id）：封存逐事件证明与离线路径重放共用
+        record = {"id": event_id, "ts": ts, "actor": actor, "channel": channel,
+                  "action": action, "command_id": command_id,
+                  "device_id": device_id, "payload": payload_text,
+                  "prev_hash": prev, "hash": h}
+        self.conn.execute("UPDATE events SET full_record_hash=? WHERE id=?",
+                          (event_full_record_hash(record), event_id))
+        return event_id
 
     def list_events(self, limit: int = 200, command_id: str | None = None,
                     device_id: str | None = None) -> list[dict]:
@@ -649,6 +712,128 @@ class Storage:
             "WHERE command_id=? AND device_id=? AND status='DOUBT'",
             (now, command_id, device_id))
         return cur.rowcount == 1
+
+    # ---------- 审计封存 ----------
+    def events_max_id(self) -> Optional[int]:
+        row = self.conn.execute("SELECT MAX(id) AS m FROM events").fetchone()
+        return row["m"]
+
+    def get_event_row(self, event_id: int) -> Optional[dict]:
+        row = self.conn.execute("SELECT * FROM events WHERE id=?",
+                                (event_id,)).fetchone()
+        return dict(row) if row else None
+
+    def events_in_range(self, from_id: int, to_id: int) -> list[dict]:
+        """闭区间 [from_id, to_id] 按全序 id 取出事件（含原始 payload 文本）。"""
+        rows = self.conn.execute(
+            "SELECT * FROM events WHERE id BETWEEN ? AND ? ORDER BY id",
+            (from_id, to_id)).fetchall()
+        return [dict(r) for r in rows]
+
+    def insert_seal_request(self, seal: dict, now: float) -> Optional[dict]:
+        """受理封存申请。同区间已有未终结/已封存记录时返回既有记录（幂等）。"""
+        try:
+            self.conn.execute(
+                "INSERT INTO seal_requests(seal_id,from_id,to_id,status,"
+                "created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?)",
+                (seal["seal_id"], seal["from_id"], seal["to_id"], "PENDING",
+                 seal["created_by"], now, now))
+            return self.get_seal_row(seal["seal_id"])
+        except sqlite3.IntegrityError:
+            row = self.conn.execute(
+                "SELECT * FROM seal_requests WHERE from_id=? AND to_id=? "
+                "AND status IN ('PENDING','SEALING','SEALED') LIMIT 1",
+                (seal["from_id"], seal["to_id"])).fetchone()
+            return dict(row) if row else None
+
+    def get_seal_row(self, seal_id: str) -> Optional[dict]:
+        row = self.conn.execute("SELECT * FROM seal_requests WHERE seal_id=?",
+                                (seal_id,)).fetchone()
+        return dict(row) if row else None
+
+    def find_active_seal_for_range(self, from_id: int,
+                                    to_id: int) -> Optional[dict]:
+        row = self.conn.execute(
+            "SELECT * FROM seal_requests WHERE from_id=? AND to_id=? "
+            "AND status IN ('PENDING','SEALING','SEALED') LIMIT 1",
+            (from_id, to_id)).fetchone()
+        return dict(row) if row else None
+
+    def list_seals(self, status: str | None = None, limit: int = 200) -> list[dict]:
+        if status:
+            rows = self.conn.execute(
+                "SELECT * FROM seal_requests WHERE status=? ORDER BY id DESC LIMIT ?",
+                (status, limit)).fetchall()
+        else:
+            rows = self.conn.execute(
+                "SELECT * FROM seal_requests ORDER BY id DESC LIMIT ?",
+                (limit,)).fetchall()
+        return [dict(r) for r in rows]
+
+    def seals_in_status(self, statuses: tuple[str, ...]) -> list[dict]:
+        qmarks = ",".join("?" * len(statuses))
+        rows = self.conn.execute(
+            f"SELECT * FROM seal_requests WHERE status IN ({qmarks}) ORDER BY id",
+            statuses).fetchall()
+        return [dict(r) for r in rows]
+
+    def mark_seal_status(self, seal_id: str, status: str, now: float):
+        self.conn.execute(
+            "UPDATE seal_requests SET status=?,updated_at=? WHERE seal_id=?",
+            (status, now, seal_id))
+
+    def mark_seal_sealing(self, seal_id: str, prior_head: str, now: float) -> bool:
+        """条件流转 PENDING→SEALING：保证只有一个执行者真正开始写包。"""
+        cur = self.conn.execute(
+            "UPDATE seal_requests SET status='SEALING',prior_head=?,updated_at=? "
+            "WHERE seal_id=? AND status='PENDING'",
+            (prior_head, now, seal_id))
+        return cur.rowcount == 1
+
+    def complete_seal(self, seal_id: str, fields: dict, now: float) -> bool:
+        cur = self.conn.execute(
+            "UPDATE seal_requests SET status='SEALED',sealed_at=?,"
+            "prior_head=COALESCE(?,prior_head),first_hash=?,last_hash=?,"
+            "event_count=?,package_path=?,package_hash=?,package_sig=?,anchor=?,"
+            "fail_reason=NULL,updated_at=? WHERE seal_id=? AND status IN ('SEALING')",
+            (now, fields.get("prior_head"), fields["first_hash"],
+             fields["last_hash"], fields["event_count"], fields["package_path"],
+             fields["package_hash"], fields["package_sig"], fields["anchor"],
+             now, seal_id))
+        return cur.rowcount == 1
+
+    def fail_seal(self, seal_id: str, reason: str, now: float) -> bool:
+        """回滚为可重试状态：SEALING→FAILED（终结），同区间可被重新申请受理。"""
+        cur = self.conn.execute(
+            "UPDATE seal_requests SET status='FAILED',fail_reason=?,updated_at=? "
+            "WHERE seal_id=? AND status IN ('SEALING','PENDING')",
+            (reason, now, seal_id))
+        return cur.rowcount == 1
+
+    def cancel_seal(self, seal_id: str, now: float) -> bool:
+        """仅 PENDING（未开始写包）可撤销。"""
+        cur = self.conn.execute(
+            "UPDATE seal_requests SET status='CANCELED',updated_at=? "
+            "WHERE seal_id=? AND status='PENDING'", (now, seal_id))
+        return cur.rowcount == 1
+
+    def add_seal_event(self, seal_id: str, now: float, actor: str, kind: str,
+                       detail: dict, audit_event_id: int | None = None) -> int:
+        cur = self.conn.execute(
+            "INSERT INTO seal_events(seal_id,ts,actor,kind,detail,audit_event_id)"
+            " VALUES(?,?,?,?,?,?)",
+            (seal_id, now, actor, kind,
+             json.dumps(detail, ensure_ascii=False, sort_keys=True), audit_event_id))
+        return cur.lastrowid
+
+    def list_seal_events(self, seal_id: str) -> list[dict]:
+        rows = self.conn.execute(
+            "SELECT * FROM seal_events WHERE seal_id=? ORDER BY id",
+            (seal_id,)).fetchall()
+        out = [dict(r) for r in rows]
+        for r in out:
+            r["detail"] = json.loads(r["detail"])
+        return out
 
     def commit(self):
         self.conn.commit()

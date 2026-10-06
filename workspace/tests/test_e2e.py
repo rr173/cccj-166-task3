@@ -558,5 +558,89 @@ class TestIncidentWorkbench(E2EBase):
         self.assertEqual(detail["targets"][0]["status"], "MISSED")
 
 
+class TestAuditSeal(E2EBase):
+    def test_seal_duplicate_verify_offline_and_restart(self):
+        from dual_gateway import sealing
+        cookie = self.sec_login()
+        # 产生一些审计事件
+        c = self.create(devices=("DEV-A1",))
+        self.confirm(c, cookie)
+        st, audit, _ = _req("GET", self.sec + "/api/audit", cookie=cookie)
+        head = audit["chain"]["head"]
+        n = audit["chain"]["events"]
+        self.assertTrue(audit["chain"]["ok"])
+
+        # 申请封存（默认全区间）
+        st, s1, _ = _req("POST", self.sec + "/api/seals", cookie=cookie, body={})
+        self.assertEqual(st, 201, s1)
+        self.assertEqual(s1["status"], "SEALED")
+        self.assertEqual((s1["from_id"], s1["to_id"]), (1, n))
+        sid = s1["seal_id"]
+
+        # 重复申请同区间：返回同一份
+        st, s2, _ = _req("POST", self.sec + "/api/seals", cookie=cookie,
+                         body={"from_id": 1, "to_id": n})
+        self.assertEqual(st, 201, s2)
+        self.assertEqual(s2["seal_id"], sid)
+
+        # 列表 / 详情
+        st, lst, _ = _req("GET", self.sec + "/api/seals", cookie=cookie)
+        self.assertEqual(st, 200)
+        self.assertTrue(any(x["seal_id"] == sid for x in lst["seals"]))
+        st, detail, _ = _req("GET", f"{self.sec}/api/seals/{sid}", cookie=cookie)
+        self.assertEqual(st, 200)
+        self.assertTrue(any(e["kind"] == "SEAL_COMPLETED"
+                            for e in detail["history"]))
+
+        # 已封存不可撤销
+        st, err, _ = _req("POST", f"{self.sec}/api/seals/{sid}/cancel",
+                          cookie=cookie, body={"reason": "x"})
+        self.assertEqual(st, 409, err)
+
+        # 在线核验通过
+        st, ver, _ = _req("POST", f"{self.sec}/api/seals/{sid}/verify",
+                          cookie=cookie, body={})
+        self.assertEqual(st, 200, ver)
+        self.assertEqual(ver["result"], "OK")
+
+        # 离线核验（只读打开磁盘库）
+        pkg_path = s1["package_path"]
+        r = sealing.verify_offline(pkg_path, self.db_path, self.cfg.seal_key)
+        self.assertEqual(r["result"], "OK")
+        self.assertEqual(r["head"], head)
+
+        # 离线删除中间记录后核验：DB_BEHIND 且定位到断点
+        self.gw.stop()
+        time.sleep(0.2)
+        import sqlite3
+        conn = sqlite3.connect(self.db_path)
+        conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        mid = max(1, n // 2)
+        conn.execute("DELETE FROM events WHERE id=?", (mid,))
+        conn.commit()
+        conn.close()
+        r = sealing.verify_offline(pkg_path, self.db_path, self.cfg.seal_key)
+        self.assertEqual(r["result"], "DB_BEHIND")
+        self.assertEqual(r["break_at"]["event_id"], mid)
+
+        # 重启网关后核验结论仍留痕且封存记录仍 SEALED
+        self.restart_gateway()
+        cookie = self.sec_login()
+        st, detail, _ = _req("GET", f"{self.sec}/api/seals/{sid}", cookie=cookie)
+        self.assertEqual(st, 200)
+        self.assertEqual(detail["status"], "SEALED")
+        # 在线核验同样定位断点
+        st, ver, _ = _req("POST", f"{self.sec}/api/seals/{sid}/verify",
+                          cookie=cookie, body={})
+        self.assertEqual(ver["result"], "DB_BEHIND")
+        self.assertEqual(ver["break_at"]["event_id"], mid)
+        # 核验失败后再 GET，处置历史含失败记录
+        st, detail, _ = _req("GET", f"{self.sec}/api/seals/{sid}", cookie=cookie)
+        self.assertTrue(any(
+            e["kind"] == "SEAL_VERIFICATION_RECORDED"
+            and e["detail"]["result"] == "DB_BEHIND"
+            for e in detail["history"]))
+
+
 if __name__ == "__main__":
     unittest.main()

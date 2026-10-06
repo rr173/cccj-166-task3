@@ -60,6 +60,13 @@ class GatewayConfig:
     sweep_interval: float = field(
         default_factory=lambda: float(_env("GW_SWEEP_INTERVAL", "0.5")))
 
+    # —— 审计封存 ——
+    # 封存包输出目录（与数据库分离存放，便于离线拷贝/只读介质归档）
+    seal_dir: str = field(default_factory=lambda: _env("GW_SEAL_DIR", "./data/seals"))
+    # 封存签名密钥：生产应由 KMS 注入；离线核验方用同一密钥验签
+    seal_key: str = field(default_factory=lambda: _env(
+        "GW_SEAL_KEY", "gw-seal-key-2026-audit-worm"))
+
     # —— 安全工作台会话 ——
     session_ttl_seconds: int = field(
         default_factory=lambda: int(_env("GW_SESSION_TTL", "900")))

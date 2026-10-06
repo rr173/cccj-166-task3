@@ -1,0 +1,72 @@
+{
+  "events": [
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-EA643CC37014",
+      "device_id": null,
+      "hash": "2b3fb78a5a0d28fc494cae146eca7f4b1facf25729b14433a9d80357462e6240",
+      "id": 1,
+      "payload": "{\"command_id\": \"CMD-EA643CC37014\", \"confirm_deadline\": 1791276014.863567, \"digest\": \"af3e28ee2f90e93b0057afbde913ab5b1592091da02a3968ea00d1f5f98838f1\", \"frozen\": {\"action\": \"EMERGENCY_STOP\", \"devices\": [\"DEV-A1\"], \"params\": {\"rpm\": 0, \"valve\": \"close\"}, \"valid_from\": 1791275954.863567, \"valid_to\": 1791276074.863567}}",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "ts": 1791275954.863567
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-EA643CC37014",
+      "device_id": null,
+      "hash": "06937a4fa2d1c167af49c7b258785b1dfb34e8f376dcd5a5b90ad2b9c9c9b05b",
+      "id": 2,
+      "payload": "{\"command_id\": \"CMD-EA643CC37014\", \"digest\": \"af3e28ee2f90e93b0057afbde913ab5b1592091da02a3968ea00d1f5f98838f1\"}",
+      "prev_hash": "2b3fb78a5a0d28fc494cae146eca7f4b1facf25729b14433a9d80357462e6240",
+      "ts": 1791275954.8668766
+    }
+  ],
+  "manifest": {
+    "anchor": "cf0a9a3b419769ddac42097134be63a7154d082fe3306451aac4de72020f9500",
+    "count": 2,
+    "created_by": "supervisor",
+    "first_hash": "2b3fb78a5a0d28fc494cae146eca7f4b1facf25729b14433a9d80357462e6240",
+    "from_id": 1,
+    "last_hash": "06937a4fa2d1c167af49c7b258785b1dfb34e8f376dcd5a5b90ad2b9c9c9b05b",
+    "last_summary": {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "hash": "06937a4fa2d1c167af49c7b258785b1dfb34e8f376dcd5a5b90ad2b9c9c9b05b",
+      "id": 2,
+      "prev_hash": "2b3fb78a5a0d28fc494cae146eca7f4b1facf25729b14433a9d80357462e6240",
+      "ts": 1791275954.8668766
+    },
+    "prior_head": "0000000000000000000000000000000000000000000000000000000000000000",
+    "proofs_head": "9b21c924ec8be28d5db08447f96114b8f4d53f6af565914bd6285cc6739f4990",
+    "seal_id": "SEAL-5671085A1DF0",
+    "sealed_at": 1791275954.8668766,
+    "to_id": 2,
+    "version": "gw-seal/v1"
+  },
+  "manifest_hash": "c871347938476c09f3a9dc4fee2497bec349564a687c7f997ea777bd37c9090c",
+  "package_hash": "4b406a908a8972e4a5b683b583d72ef2594e7a13d2bec45ad7bdc93a773e6b4e",
+  "package_sig": "f9d061bec74a2e30e7d6948e88f3373e744a48170300202fdc87b3d5d4929390",
+  "proofs": [
+    {
+      "event_id": 1,
+      "payload_hash": "8e728179f493010eac44954eb0cc05928f4ed8cd7c7591dc98be5c8f0df820be",
+      "position": 1,
+      "prev_proof": "0000000000000000000000000000000000000000000000000000000000000000",
+      "proof": "8557d1037568c803ceec22881405c7d4ac5b644068aa4c754cd5ec4837fe81c3",
+      "record_hash": "2defce4af48bbfc8ee0169944bc901e424a1525fa636cedeaddb3cef5fbbf400"
+    },
+    {
+      "event_id": 2,
+      "payload_hash": "6010f426af9a9c85c63612b7ff91f41136a792dbbe41ab86ff49c83fd4a30f56",
+      "position": 2,
+      "prev_proof": "8557d1037568c803ceec22881405c7d4ac5b644068aa4c754cd5ec4837fe81c3",
+      "proof": "9b21c924ec8be28d5db08447f96114b8f4d53f6af565914bd6285cc6739f4990",
+      "record_hash": "edded70d102702749ca2bd229b26d2f6d173d3172509189ae855e5f410c1891f"
+    }
+  ]
+}

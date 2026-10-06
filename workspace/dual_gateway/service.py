@@ -15,6 +15,7 @@ from typing import Any, Callable, Optional
 from . import models as M
 from .errors import (Conflict, DeviceRejected, FrozenMismatch, InvalidReceipt,
                      InvalidState, NotFound)
+from . import sealing as SEAL
 from .security import (canonical_json, digest_payload, hash_confirm_code,
                        ledger_anchor, ledger_book_hash, ledger_entry_hash,
                        ledger_signature_valid, new_confirm_code)
@@ -23,6 +24,10 @@ from .storage import Storage
 
 def _new_incident_id() -> str:
     return "INC-" + uuid.uuid4().hex[:12].upper()
+
+
+def _new_seal_id() -> str:
+    return "SEAL-" + uuid.uuid4().hex[:12].upper()
 
 
 def _cmd_dict(row: dict) -> dict:
@@ -1071,6 +1076,295 @@ class CommandService:
             for d in devs:
                 d.pop("preshared_key", None)
             return devs
+
+    # ================= 审计封存（仅安全通道可访问）=================
+    # 崩溃注入点：测试在“已置 SEALING、尚未写包”处令进程/事务失败，
+    # 以验证重启恢复不会留下半成品或永久锁。生产中恒为 None。
+    seal_crash_hook: Optional[Callable[[str, str], None]] = None
+
+    def request_seal(self, actor: str, from_id: Optional[int] = None,
+                     to_id: Optional[int] = None) -> dict:
+        """安全角色申请按事件区间封存。
+
+        * 区间省略时默认封存全部现有事件（1..当前链尾）；
+        * 同一区间并发/重复申请只产生一份结果——已有 PENDING/SEALING/SEALED
+          记录时幂等返回原结果；
+        * 受理后同步生成：只有从 PENDING 成功置为 SEALING 的执行者真正写包；
+        * 任何失败都回滚为 FAILED（可重试），绝不留半成品或永久锁。
+        """
+        with self._lock:
+            now = self.now()
+            max_id = self.db.events_max_id()
+            if max_id is None:
+                raise InvalidState("审计日志为空，没有可封存的事件")
+            if to_id is None:
+                to_id = max_id
+            if from_id is None:
+                from_id = 1
+            if not isinstance(from_id, int) or not isinstance(to_id, int):
+                raise InvalidState("区间端点必须为整数事件 id")
+            if from_id <= 0 or to_id < from_id:
+                raise InvalidState(f"非法事件区间: [{from_id},{to_id}]")
+            if to_id > max_id:
+                raise InvalidState(
+                    f"区间末端 {to_id} 超出当前事件链尾 {max_id}，不得封存不存在的事件")
+            if not self.db.get_event_row(from_id) or not self.db.get_event_row(to_id):
+                raise NotFound("区间端点事件不存在")
+
+            existing = self.db.find_active_seal_for_range(from_id, to_id)
+            if existing:
+                # 重复/并发申请：返回同一份结果，绝不新建第二份
+                if existing["status"] == M.SEAL_SEALING:
+                    self._generate_seal(existing, now)
+                    existing = self.db.get_seal_row(existing["seal_id"])
+                return self._seal_view(existing, include_history=False)
+
+            seal_id = _new_seal_id()
+            try:
+                row = self.db.insert_seal_request(
+                    {"seal_id": seal_id, "from_id": from_id, "to_id": to_id,
+                     "created_by": actor}, now)
+                if row is None or row["seal_id"] != seal_id:
+                    # 并发下唯一索引抢先：回放既有结果
+                    if row:
+                        if row["status"] == M.SEAL_SEALING:
+                            self._generate_seal(row, now)
+                            row = self.db.get_seal_row(row["seal_id"])
+                        return self._seal_view(row, include_history=False)
+                event_id = self.db.append_event(
+                    now, actor, M.AUDIT_SEC, "SEAL_REQUESTED",
+                    {"seal_id": seal_id, "from_id": from_id, "to_id": to_id})
+                self.db.add_seal_event(
+                    seal_id, now, actor, M.SEV_REQUESTED,
+                    {"from_id": from_id, "to_id": to_id},
+                    audit_event_id=event_id)
+                self.db.commit()
+            except Exception:
+                self.db.rollback()
+                raise
+
+            row = self.db.get_seal_row(seal_id)
+            self._generate_seal(row, now)
+            return self._seal_view(self.db.get_seal_row(seal_id),
+                                   include_history=False)
+
+    def _generate_seal(self, row: dict, now: float):
+        """把一份 PENDING/SEALING 申请推进到 SEALED；失败回滚为 FAILED。
+
+        PENDING→SEALING 的条件更新保证同区间只有一个执行者真正开始写包。
+        已在 SEALING（含重启续写）时直接基于区间事件重算——封存内容由事件
+        区间与密钥完全决定，续写必然生成同一份包。
+        """
+        seal_id = row["seal_id"]
+        from_id, to_id = row["from_id"], row["to_id"]
+        try:
+            first = self.db.get_event_row(from_id)
+            if not first:
+                raise SEAL.SealError(f"区间首事件 {from_id} 不存在")
+            if row["status"] == M.SEAL_PENDING:
+                if not self.db.mark_seal_sealing(seal_id, first["prev_hash"], now):
+                    # 已有另一个执行者置位 SEALING：本线程不重复写包
+                    return
+                event_id = self.db.append_event(
+                    now, "system", M.AUDIT_SEC, "SEAL_GENERATION_STARTED",
+                    {"seal_id": seal_id, "from_id": from_id, "to_id": to_id})
+                self.db.add_seal_event(
+                    seal_id, now, "system", M.SEV_STARTED,
+                    {"from_id": from_id, "to_id": to_id},
+                    audit_event_id=event_id)
+                self.db.commit()
+                row = self.db.get_seal_row(seal_id)
+
+            # 崩溃注入：已置 SEALING（锁已“占用”）但还没写任何包
+            if self.seal_crash_hook is not None:
+                self.seal_crash_hook("after_sealing_mark", seal_id)
+
+            events = self.db.events_in_range(from_id, to_id)
+            sealed_at = self._sealed_at(events)
+            package = SEAL.build_seal_package(
+                seal_id=seal_id, created_by=row["created_by"],
+                from_id=from_id, to_id=to_id, events=events,
+                sealed_at=sealed_at, seal_key=self.cfg.seal_key)
+            path = SEAL.write_package_atomic(package, self.cfg.seal_dir)
+            self.db.complete_seal(seal_id, {
+                "prior_head": package["manifest"]["prior_head"],
+                "first_hash": package["manifest"]["first_hash"],
+                "last_hash": package["manifest"]["last_hash"],
+                "event_count": package["manifest"]["count"],
+                "package_path": path,
+                "package_hash": package["package_hash"],
+                "package_sig": package["package_sig"],
+                "anchor": package["manifest"]["anchor"]}, sealed_at)
+            event_id = self.db.append_event(
+                sealed_at, "system", M.AUDIT_SEC, "SEAL_COMPLETED",
+                {"seal_id": seal_id, "from_id": from_id, "to_id": to_id,
+                 "event_count": package["manifest"]["count"],
+                 "package_hash": package["package_hash"],
+                 "anchor": package["manifest"]["anchor"],
+                 "last_hash": package["manifest"]["last_hash"]})
+            self.db.add_seal_event(
+                seal_id, sealed_at, "system", M.SEV_COMPLETED,
+                {"package_path": path, "package_hash": package["package_hash"],
+                 "anchor": package["manifest"]["anchor"],
+                 "event_count": package["manifest"]["count"],
+                 "prior_head": package["manifest"]["prior_head"],
+                 "last_hash": package["manifest"]["last_hash"]},
+                audit_event_id=event_id)
+            self.db.commit()
+        except Exception as exc:
+            # 明确回滚为可重试状态，释放“占用”；正式封存包靠原子落盘不会有半成品
+            self.db.rollback()
+            try:
+                self.db.fail_seal(seal_id, str(exc), self.now())
+                self.db.append_event(
+                    self.now(), "system", M.AUDIT_SEC, "SEAL_FAILED",
+                    {"seal_id": seal_id, "reason": str(exc)})
+                self.db.add_seal_event(
+                    seal_id, self.now(), "system", M.SEV_FAILED,
+                    {"reason": str(exc)})
+                self.db.commit()
+            except Exception:
+                self.db.rollback()
+            raise InvalidState(f"封存生成失败并已回滚为可重试: {exc}")
+
+    @staticmethod
+    def _sealed_at(events: list[dict]) -> float:
+        # 封存时间取区间末事件时间（重启续写时仍确定，不依赖“现在”）
+        return events[-1]["ts"]
+
+    def recover_seals_on_startup(self):
+        """服务重启恢复：不留半成品、不占用永久锁。
+
+        仍处 SEALING 的申请——内容完全由区间事件决定——直接续写完成；
+        续写失败则回滚为 FAILED（同区间可重新申请）。PENDING 本就未写包，
+        保持可重试。另清理可能残留的 .tmp 临时文件。
+        """
+        import glob
+        import os
+        with self._lock:
+            for tmp in glob.glob(os.path.join(self.cfg.seal_dir, ".*.tmp")):
+                try:
+                    os.unlink(tmp)
+                except OSError:
+                    pass
+            sealing = self.db.seals_in_status((M.SEAL_SEALING,))
+            resumed = 0
+            for row in sealing:
+                try:
+                    self.db.add_seal_event(
+                        row["seal_id"], self.now(), "system", M.SEV_RESUMED,
+                        {"reason": "service_restart_resume"})
+                    self.db.commit()
+                    self._generate_seal(row, self.now())
+                    resumed += 1
+                except Exception:
+                    # _generate_seal 已回滚为 FAILED
+                    continue
+            return {"resumed": resumed, "stuck_sealing": 0}
+
+    def cancel_seal(self, actor: str, seal_id: str, reason: str = "") -> dict:
+        """撤销封存申请：只有未开始写包的 PENDING 申请可撤销。
+        SEALING/SEALED 一律拒绝（已封存内容不得覆盖，在途包不可打断留半成品）。"""
+        with self._lock:
+            now = self.now()
+            row = self.db.get_seal_row(seal_id)
+            if not row:
+                raise NotFound("封存申请不存在")
+            if row["status"] == M.SEAL_SEALING:
+                raise Conflict("封存包正在生成，不可撤销（重启后将自动续写完成）")
+            if row["status"] == M.SEAL_SEALED:
+                raise Conflict("已封存内容不可撤销/覆盖")
+            if row["status"] in (M.SEAL_CANCELED, M.SEAL_FAILED):
+                raise Conflict("申请已终结", details={"status": row["status"]})
+            try:
+                if not self.db.cancel_seal(seal_id, now):
+                    raise Conflict("仅未开始写包的申请可以撤销")
+                event_id = self.db.append_event(
+                    now, actor, M.AUDIT_SEC, "SEAL_CANCELED",
+                    {"seal_id": seal_id, "reason": reason})
+                self.db.add_seal_event(
+                    seal_id, now, actor, M.SEV_CANCELED,
+                    {"reason": reason}, audit_event_id=event_id)
+                self.db.commit()
+            except Exception:
+                self.db.rollback()
+                raise
+            return self._seal_view(self.db.get_seal_row(seal_id),
+                                   include_history=False)
+
+    def list_seals(self, status: Optional[str] = None) -> list[dict]:
+        with self._lock:
+            return [self._seal_view(r, include_history=False)
+                    for r in self.db.list_seals(status=status)]
+
+    def seal_detail(self, seal_id: str) -> dict:
+        with self._lock:
+            row = self.db.get_seal_row(seal_id)
+            if not row:
+                raise NotFound("封存申请不存在")
+            return self._seal_view(row, include_history=True)
+
+    def _seal_view(self, row: dict, include_history: bool) -> dict:
+        out = dict(row)
+        if include_history:
+            out["history"] = self.db.list_seal_events(row["seal_id"])
+        return out
+
+    def read_seal_package(self, seal_id: str) -> tuple[dict, bytes, str]:
+        """读取已封存的包内容（下载/在线核验用）。仅 SEALED 可取。"""
+        with self._lock:
+            row = self.db.get_seal_row(seal_id)
+            if not row:
+                raise NotFound("封存申请不存在")
+            if row["status"] != M.SEAL_SEALED:
+                raise InvalidState("封存尚未完成，无法获取封存包",
+                                   details={"status": row["status"]})
+            with open(row["package_path"], "rb") as f:
+                return row, f.read(), row["package_path"]
+
+    def verify_seal_online(self, actor: str, seal_id: str) -> dict:
+        """在线核验：用当前数据库对已封存包做离线比对，并把结论记入处置历史。
+
+        核验本身只读；核验失败不改变封存结果（封存不可覆盖），仅留痕并在
+        工作台标记“核验失败”。
+        """
+        with self._lock:
+            row = self.db.get_seal_row(seal_id)
+            if not row:
+                raise NotFound("封存申请不存在")
+            if row["status"] != M.SEAL_SEALED:
+                raise InvalidState("仅已封存记录可核验",
+                                   details={"status": row["status"]})
+            package = SEAL.load_package(row["package_path"])
+            self_check = SEAL.verify_package_self(package, self.cfg.seal_key)
+            if self_check["result"] != "OK":
+                result = {**self_check, "seal_id": seal_id,
+                          "package_path": row["package_path"],
+                          "db_path": self.db.db_path}
+            elif self.db.db_path == ":memory:":
+                # 测试/内存库：对同一连接只读比对
+                result = SEAL.compare_package_against_connection(
+                    package, self.db.conn, self_check,
+                    package_path=row["package_path"], db_path=":memory:")
+            else:
+                result = SEAL.verify_offline(
+                    row["package_path"], self.db.db_path, self.cfg.seal_key)
+            now = self.now()
+            try:
+                event_id = self.db.append_event(
+                    now, actor, M.AUDIT_SEC, "SEAL_VERIFIED",
+                    {"seal_id": seal_id, "result": result["result"],
+                     "break_at": result.get("break_at")})
+                self.db.add_seal_event(
+                    seal_id, now, actor, M.SEV_VERIFIED,
+                    {"result": result["result"],
+                     "break_at": result.get("break_at")},
+                    audit_event_id=event_id)
+                self.db.commit()
+            except Exception:
+                self.db.rollback()
+                raise
+            return result
 
 
 def _safe_int(v: Any):

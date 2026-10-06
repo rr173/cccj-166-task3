@@ -1,0 +1,1832 @@
+{
+  "events": [
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-D53C8F2B030D",
+      "device_id": null,
+      "hash": "9b0f4a3b3c778065af641b8bcb3f81a4facc4b61da1ddd244f999222252a2b14",
+      "id": 1,
+      "payload": "{\"command_id\": \"CMD-D53C8F2B030D\", \"confirm_deadline\": 1791275507.8683798, \"digest\": \"926788c02da95272c4c59c474c8a021de735b5118c69b2942c0a48af93a656e8\", \"frozen\": {\"action\": \"EMERGENCY_STOP\", \"devices\": [\"DEV-A1\", \"DEV-A2\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275447.8683798, \"valid_to\": 1791275567.8683798}}",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "ts": 1791275447.8683798
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-D53C8F2B030D",
+      "device_id": null,
+      "hash": "26970ae8b746e48741976df308678fc34deea6e4a92db19e44276339ed905cc8",
+      "id": 2,
+      "payload": "{\"command_id\": \"CMD-D53C8F2B030D\", \"digest\": \"926788c02da95272c4c59c474c8a021de735b5118c69b2942c0a48af93a656e8\"}",
+      "prev_hash": "9b0f4a3b3c778065af641b8bcb3f81a4facc4b61da1ddd244f999222252a2b14",
+      "ts": 1791275447.8725104
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A1",
+      "hash": "a68c42a75d9c0f04f73dbccc157bbb405c669c79d906222a0462b79735c0ffb4",
+      "id": 3,
+      "payload": "{\"boot_code\": \"BOOT-481B4551FFE6B02C2E04\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": false}",
+      "prev_hash": "26970ae8b746e48741976df308678fc34deea6e4a92db19e44276339ed905cc8",
+      "ts": 1791275447.8751068
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-D53C8F2B030D",
+      "device_id": "DEV-A1",
+      "hash": "40469d339b9bc84dbff28414db6d4eec080b6c59cada138fc52277252e6a1bea",
+      "id": 4,
+      "payload": "{\"boot_code\": \"BOOT-481B4551FFE6B02C2E04\", \"command_id\": \"CMD-D53C8F2B030D\", \"digest\": \"926788c02da95272c4c59c474c8a021de735b5118c69b2942c0a48af93a656e8\"}",
+      "prev_hash": "a68c42a75d9c0f04f73dbccc157bbb405c669c79d906222a0462b79735c0ffb4",
+      "ts": 1791275447.8772533
+    },
+    {
+      "action": "RECEIPT_ACCEPTED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-D53C8F2B030D",
+      "device_id": "DEV-A1",
+      "hash": "89fd059e547f20765cf4c42df2ae9e8034be66c203541b5a8bebbb0577182fef",
+      "id": 5,
+      "payload": "{\"boot_code\": \"BOOT-481B4551FFE6B02C2E04\", \"command_id\": \"CMD-D53C8F2B030D\", \"message\": \"\", \"result\": \"EXECUTED\", \"seq\": 1}",
+      "prev_hash": "40469d339b9bc84dbff28414db6d4eec080b6c59cada138fc52277252e6a1bea",
+      "ts": 1791275447.8814886
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A2",
+      "hash": "c454056240a08c158712617188bab60f3f1d1626f3aa282881f7e18d8b519083",
+      "id": 6,
+      "payload": "{\"boot_code\": \"BOOT-F4975021B28EDC3BA87C\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": false}",
+      "prev_hash": "89fd059e547f20765cf4c42df2ae9e8034be66c203541b5a8bebbb0577182fef",
+      "ts": 1791275447.8845212
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": "CMD-D53C8F2B030D",
+      "device_id": "DEV-A2",
+      "hash": "44bdb38137eae7f976bdad524757ef3103d58ff14297cc2b08e6cfd1459954b1",
+      "id": 7,
+      "payload": "{\"boot_code\": \"BOOT-F4975021B28EDC3BA87C\", \"command_id\": \"CMD-D53C8F2B030D\", \"digest\": \"926788c02da95272c4c59c474c8a021de735b5118c69b2942c0a48af93a656e8\"}",
+      "prev_hash": "c454056240a08c158712617188bab60f3f1d1626f3aa282881f7e18d8b519083",
+      "ts": 1791275447.890099
+    },
+    {
+      "action": "RECEIPT_ACCEPTED",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": "CMD-D53C8F2B030D",
+      "device_id": "DEV-A2",
+      "hash": "f0b82fa3625efcb0edbdb0bfb0da50103a4dacb6bfa5a3ead3745beb68ca9c3b",
+      "id": 8,
+      "payload": "{\"boot_code\": \"BOOT-F4975021B28EDC3BA87C\", \"command_id\": \"CMD-D53C8F2B030D\", \"message\": \"\", \"result\": \"EXECUTED\", \"seq\": 1}",
+      "prev_hash": "44bdb38137eae7f976bdad524757ef3103d58ff14297cc2b08e6cfd1459954b1",
+      "ts": 1791275447.8944829
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-99097DC9F814",
+      "device_id": null,
+      "hash": "ed13669cf00a6f0a141ef4667e34508d5410c8edcf1003a8d2c4c2bde0c9feab",
+      "id": 9,
+      "payload": "{\"command_id\": \"CMD-99097DC9F814\", \"confirm_deadline\": 1791275508.208005, \"digest\": \"f9b604a26015cfbf2f3d047f3622af02d33e8d63ef397816a84d1aeb979a917e\", \"frozen\": {\"action\": \"PURGE_LINE\", \"devices\": [\"DEV-A1\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275448.208005, \"valid_to\": 1791275568.208005}}",
+      "prev_hash": "f0b82fa3625efcb0edbdb0bfb0da50103a4dacb6bfa5a3ead3745beb68ca9c3b",
+      "ts": 1791275448.208005
+    },
+    {
+      "action": "CONFIRM_DENIED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-99097DC9F814",
+      "device_id": null,
+      "hash": "58fa44ded5529ad8f0d87672d3e7940ed4fe4d356e104a5f1fb77b568770b1cd",
+      "id": 10,
+      "payload": "{\"reason\": \"BAD_CODE\"}",
+      "prev_hash": "ed13669cf00a6f0a141ef4667e34508d5410c8edcf1003a8d2c4c2bde0c9feab",
+      "ts": 1791275448.2143197
+    },
+    {
+      "action": "CONFIRM_DENIED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-99097DC9F814",
+      "device_id": null,
+      "hash": "496b31b8f7fd33fea17b9d2cdacc31173ec17e6adba6eec8ce5d853cc4434765",
+      "id": 11,
+      "payload": "{\"reason\": \"DIGEST_MISMATCH\"}",
+      "prev_hash": "58fa44ded5529ad8f0d87672d3e7940ed4fe4d356e104a5f1fb77b568770b1cd",
+      "ts": 1791275448.21728
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-99097DC9F814",
+      "device_id": null,
+      "hash": "93c0096d51d4b980b9018cf4b93b42a5ab458ea29191c207408058723f83c86e",
+      "id": 12,
+      "payload": "{\"command_id\": \"CMD-99097DC9F814\", \"digest\": \"f9b604a26015cfbf2f3d047f3622af02d33e8d63ef397816a84d1aeb979a917e\"}",
+      "prev_hash": "496b31b8f7fd33fea17b9d2cdacc31173ec17e6adba6eec8ce5d853cc4434765",
+      "ts": 1791275448.2204504
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-7622C9AB2467",
+      "device_id": null,
+      "hash": "592fe54a233f7542f82fe4b849861daf445e7b2e1ebe33c667a7e2e6fbe4b4c0",
+      "id": 13,
+      "payload": "{\"command_id\": \"CMD-7622C9AB2467\", \"confirm_deadline\": 1791275508.221783, \"digest\": \"e46326f234841db072075702f10c8a1f59fb9ce6eb5d9d0841bb143000332b97\", \"frozen\": {\"action\": \"TEMP_CUT\", \"devices\": [\"DEV-A1\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275448.221783, \"valid_to\": 1791275568.221783}}",
+      "prev_hash": "93c0096d51d4b980b9018cf4b93b42a5ab458ea29191c207408058723f83c86e",
+      "ts": 1791275448.221783
+    },
+    {
+      "action": "CMD_REVOKED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-7622C9AB2467",
+      "device_id": null,
+      "hash": "865f82e4c15367e3f0d7e54dd83caad33d33f5e46fed5937ae8f911e136b19a6",
+      "id": 14,
+      "payload": "{\"command_id\": \"CMD-7622C9AB2467\", \"reason\": \"计划取消\"}",
+      "prev_hash": "592fe54a233f7542f82fe4b849861daf445e7b2e1ebe33c667a7e2e6fbe4b4c0",
+      "ts": 1791275448.2231817
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-BA9EE160DCED",
+      "device_id": null,
+      "hash": "24853eeac945401163ee96f717260eae3b50ad0979a02d0d5e8926fd137c0af9",
+      "id": 15,
+      "payload": "{\"command_id\": \"CMD-BA9EE160DCED\", \"confirm_deadline\": 1791275508.22449, \"digest\": \"e7502168561a47fe3da780ca35d7865541ffc6871dac7dd97b58fa1c8a2b1965\", \"frozen\": {\"action\": \"TEMP_CUT\", \"devices\": [\"DEV-A1\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275448.22449, \"valid_to\": 1791275568.22449}}",
+      "prev_hash": "865f82e4c15367e3f0d7e54dd83caad33d33f5e46fed5937ae8f911e136b19a6",
+      "ts": 1791275448.22449
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-BA9EE160DCED",
+      "device_id": null,
+      "hash": "d1d3c55e92ce63bd3c513652f8874f0c7c6da735b97e9e5557b04fe4ca9bbbea",
+      "id": 16,
+      "payload": "{\"command_id\": \"CMD-BA9EE160DCED\", \"digest\": \"e7502168561a47fe3da780ca35d7865541ffc6871dac7dd97b58fa1c8a2b1965\"}",
+      "prev_hash": "24853eeac945401163ee96f717260eae3b50ad0979a02d0d5e8926fd137c0af9",
+      "ts": 1791275448.2258177
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A1",
+      "hash": "2a122ccd4e73518337148f2c51379ea4b8c0fc40fb380f33e54f5dc7e182ece8",
+      "id": 17,
+      "payload": "{\"boot_code\": \"BOOT-D96E5EE58895ADBD0FDD\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": true}",
+      "prev_hash": "d1d3c55e92ce63bd3c513652f8874f0c7c6da735b97e9e5557b04fe4ca9bbbea",
+      "ts": 1791275448.2274399
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-99097DC9F814",
+      "device_id": "DEV-A1",
+      "hash": "2a30e86d4df340096d51ef5b557b454998c0afc48144293abee309fdf74b0d13",
+      "id": 18,
+      "payload": "{\"boot_code\": \"BOOT-D96E5EE58895ADBD0FDD\", \"command_id\": \"CMD-99097DC9F814\", \"digest\": \"f9b604a26015cfbf2f3d047f3622af02d33e8d63ef397816a84d1aeb979a917e\"}",
+      "prev_hash": "2a122ccd4e73518337148f2c51379ea4b8c0fc40fb380f33e54f5dc7e182ece8",
+      "ts": 1791275448.2292073
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-BA9EE160DCED",
+      "device_id": "DEV-A1",
+      "hash": "0682dc793041cb1e26c24556bb96e015b7c9d47fe07fae72795fa326e3c608db",
+      "id": 19,
+      "payload": "{\"boot_code\": \"BOOT-D96E5EE58895ADBD0FDD\", \"command_id\": \"CMD-BA9EE160DCED\", \"digest\": \"e7502168561a47fe3da780ca35d7865541ffc6871dac7dd97b58fa1c8a2b1965\"}",
+      "prev_hash": "2a30e86d4df340096d51ef5b557b454998c0afc48144293abee309fdf74b0d13",
+      "ts": 1791275448.2292073
+    },
+    {
+      "action": "RECEIPT_ACCEPTED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-BA9EE160DCED",
+      "device_id": "DEV-A1",
+      "hash": "67259473c56adfcfa943879f4211516d117cb4ba7fa4f742ff5f3822e1ecdcce",
+      "id": 20,
+      "payload": "{\"boot_code\": \"BOOT-D96E5EE58895ADBD0FDD\", \"command_id\": \"CMD-BA9EE160DCED\", \"message\": \"\", \"result\": \"EXECUTED\", \"seq\": 1}",
+      "prev_hash": "0682dc793041cb1e26c24556bb96e015b7c9d47fe07fae72795fa326e3c608db",
+      "ts": 1791275448.2317023
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-FB432A77B8FA",
+      "device_id": null,
+      "hash": "7398188c5e082aff959bd627b85eba09ebae125055e85e730e06e35ce2c74439",
+      "id": 21,
+      "payload": "{\"command_id\": \"CMD-FB432A77B8FA\", \"confirm_deadline\": 1791275449.234077, \"digest\": \"3145cf6cec627608b8eedcbb27491ace11ec82b73972cdcf6d27573cbbcdd24b\", \"frozen\": {\"action\": \"REMOTE_TRIP\", \"devices\": [\"DEV-A1\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275448.234077, \"valid_to\": 1791275449.234077}}",
+      "prev_hash": "67259473c56adfcfa943879f4211516d117cb4ba7fa4f742ff5f3822e1ecdcce",
+      "ts": 1791275448.234077
+    },
+    {
+      "action": "CMD_EXPIRED",
+      "actor": "system",
+      "channel": "SYSTEM",
+      "command_id": "CMD-FB432A77B8FA",
+      "device_id": null,
+      "hash": "255779cea5d2b629446e017d8a7171874c51d43ee0b2b4786c6f42676eddc94f",
+      "id": 22,
+      "payload": "{\"command_id\": \"CMD-FB432A77B8FA\", \"reason\": \"CONFIRM_TIMEOUT\"}",
+      "prev_hash": "7398188c5e082aff959bd627b85eba09ebae125055e85e730e06e35ce2c74439",
+      "ts": 1791275449.373487
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-4D00EB2A282F",
+      "device_id": null,
+      "hash": "f0ede079a57316fb857a41bb210bbeb1169140769a489aea8293b2872b40122f",
+      "id": 23,
+      "payload": "{\"command_id\": \"CMD-4D00EB2A282F\", \"confirm_deadline\": 1791275509.8463202, \"digest\": \"0acf39b44ead108ddf2b4e04a5a82c2bf4081d42cae882e65d3937cf6b4131a1\", \"frozen\": {\"action\": \"OVERSPEED_TEST\", \"devices\": [\"DEV-A1\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275449.8463202, \"valid_to\": 1791275569.8463202}}",
+      "prev_hash": "255779cea5d2b629446e017d8a7171874c51d43ee0b2b4786c6f42676eddc94f",
+      "ts": 1791275449.8463202
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-4D00EB2A282F",
+      "device_id": null,
+      "hash": "5eccda1e58f68c708110e361e9f2d08177a3de912713849913dca880c46514b3",
+      "id": 24,
+      "payload": "{\"command_id\": \"CMD-4D00EB2A282F\", \"digest\": \"0acf39b44ead108ddf2b4e04a5a82c2bf4081d42cae882e65d3937cf6b4131a1\"}",
+      "prev_hash": "f0ede079a57316fb857a41bb210bbeb1169140769a489aea8293b2872b40122f",
+      "ts": 1791275449.8515136
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A1",
+      "hash": "b99ca7650dc729b026a53b582843727b6e22b652e2274e5d7c526a07c1b73310",
+      "id": 25,
+      "payload": "{\"boot_code\": \"BOOT-E721BCD833497EFE4F0E\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": true}",
+      "prev_hash": "5eccda1e58f68c708110e361e9f2d08177a3de912713849913dca880c46514b3",
+      "ts": 1791275449.8543274
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-4D00EB2A282F",
+      "device_id": "DEV-A1",
+      "hash": "dd6854851978421e4f00e369df831001b6083fd7115ed5ccd95c61cdc1af4142",
+      "id": 26,
+      "payload": "{\"boot_code\": \"BOOT-E721BCD833497EFE4F0E\", \"command_id\": \"CMD-4D00EB2A282F\", \"digest\": \"0acf39b44ead108ddf2b4e04a5a82c2bf4081d42cae882e65d3937cf6b4131a1\"}",
+      "prev_hash": "b99ca7650dc729b026a53b582843727b6e22b652e2274e5d7c526a07c1b73310",
+      "ts": 1791275449.8576748
+    },
+    {
+      "action": "RECEIPT_REJECTED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-4D00EB2A282F",
+      "device_id": "DEV-A1",
+      "hash": "aed027c8c98c28c0bb95882313cccf4c24a60d6d923e24a9358b396f8d59c7f3",
+      "id": 27,
+      "payload": "{\"boot_code\": \"BOOT-THE-OLD-ONE\", \"command_id\": \"CMD-4D00EB2A282F\", \"reason\": \"STALE_BOOT\", \"result\": \"EXECUTED\", \"seq\": 1}",
+      "prev_hash": "dd6854851978421e4f00e369df831001b6083fd7115ed5ccd95c61cdc1af4142",
+      "ts": 1791275449.8597014
+    },
+    {
+      "action": "RECEIPT_REJECTED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-4D00EB2A282F",
+      "device_id": "DEV-A1",
+      "hash": "ca33747466f3815a88621514e0b6d2e572d706bb44a53fff12ea2393aba81f4d",
+      "id": 28,
+      "payload": "{\"boot_code\": \"BOOT-E721BCD833497EFE4F0E\", \"command_id\": \"CMD-4D00EB2A282F\", \"reason\": \"OUT_OF_ORDER_GAP\", \"result\": \"EXECUTED\", \"seq\": 5}",
+      "prev_hash": "aed027c8c98c28c0bb95882313cccf4c24a60d6d923e24a9358b396f8d59c7f3",
+      "ts": 1791275449.8617752
+    },
+    {
+      "action": "RECEIPT_ACCEPTED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-4D00EB2A282F",
+      "device_id": "DEV-A1",
+      "hash": "c5c7ccb254a002b18cdca36ca1ce859455978846b810c919c69ed7923661a5e0",
+      "id": 29,
+      "payload": "{\"boot_code\": \"BOOT-E721BCD833497EFE4F0E\", \"command_id\": \"CMD-4D00EB2A282F\", \"message\": \"\", \"result\": \"EXECUTED\", \"seq\": 1}",
+      "prev_hash": "ca33747466f3815a88621514e0b6d2e572d706bb44a53fff12ea2393aba81f4d",
+      "ts": 1791275449.8640785
+    },
+    {
+      "action": "RECEIPT_REJECTED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-OTHER",
+      "device_id": "DEV-A1",
+      "hash": "3bc337860294271181fa2719c396650cc97b6e66a275820d9a75126ab85d7508",
+      "id": 30,
+      "payload": "{\"boot_code\": \"BOOT-E721BCD833497EFE4F0E\", \"command_id\": \"CMD-OTHER\", \"reason\": \"REUSED_OR_OLD_SEQ\", \"result\": \"EXECUTED\", \"seq\": 1}",
+      "prev_hash": "c5c7ccb254a002b18cdca36ca1ce859455978846b810c919c69ed7923661a5e0",
+      "ts": 1791275449.86593
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-37176AB298B8",
+      "device_id": null,
+      "hash": "f709fc8e59de18ab4457fbf542ddcb23b933e2e88a0be5f62d9bc45f8f6b6b5b",
+      "id": 31,
+      "payload": "{\"command_id\": \"CMD-37176AB298B8\", \"confirm_deadline\": 1791275509.8686576, \"digest\": \"eb57dee3e807746813250fedb899c3d02403420dfb9324d4d087f105c7e9719b\", \"frozen\": {\"action\": \"EMERGENCY_STOP\", \"devices\": [\"DEV-A2\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275449.8686576, \"valid_to\": 1791275569.8686576}}",
+      "prev_hash": "3bc337860294271181fa2719c396650cc97b6e66a275820d9a75126ab85d7508",
+      "ts": 1791275449.8686576
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-37176AB298B8",
+      "device_id": null,
+      "hash": "e17d2964ca25726707be154dbf141be9d72853bcdb61b6396e98acc20ed1ee0c",
+      "id": 32,
+      "payload": "{\"command_id\": \"CMD-37176AB298B8\", \"digest\": \"eb57dee3e807746813250fedb899c3d02403420dfb9324d4d087f105c7e9719b\"}",
+      "prev_hash": "f709fc8e59de18ab4457fbf542ddcb23b933e2e88a0be5f62d9bc45f8f6b6b5b",
+      "ts": 1791275449.870972
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A2",
+      "hash": "21a7f12e01fa63aa93fde8f6db181a973eb08f8b601b26336cf5c67d2b70461a",
+      "id": 33,
+      "payload": "{\"boot_code\": \"BOOT-E2E7C743A6E3DBF9B186\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": true}",
+      "prev_hash": "e17d2964ca25726707be154dbf141be9d72853bcdb61b6396e98acc20ed1ee0c",
+      "ts": 1791275449.8730037
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": "CMD-37176AB298B8",
+      "device_id": "DEV-A2",
+      "hash": "df4ed989fe5ff178ed9019ba407c18469ccecfac707a98d2cdacf52c28d30f36",
+      "id": 34,
+      "payload": "{\"boot_code\": \"BOOT-E2E7C743A6E3DBF9B186\", \"command_id\": \"CMD-37176AB298B8\", \"digest\": \"eb57dee3e807746813250fedb899c3d02403420dfb9324d4d087f105c7e9719b\"}",
+      "prev_hash": "21a7f12e01fa63aa93fde8f6db181a973eb08f8b601b26336cf5c67d2b70461a",
+      "ts": 1791275449.87466
+    },
+    {
+      "action": "INCIDENT_OPENED",
+      "actor": "system",
+      "channel": "SECURITY",
+      "command_id": "CMD-99097DC9F814",
+      "device_id": "DEV-A1",
+      "hash": "c971bc5aad332c1507517ce67ab722052400aaa184535fc9fd4b7ff2162362ba",
+      "id": 35,
+      "payload": "{\"command_id\": \"CMD-99097DC9F814\", \"device_id\": \"DEV-A1\", \"digest\": \"f9b604a26015cfbf2f3d047f3622af02d33e8d63ef397816a84d1aeb979a917e\", \"dispatched_boot\": \"BOOT-D96E5EE58895ADBD0FDD\", \"incident_id\": \"INC-4699F08E4147\", \"reason\": \"GATEWAY_RESTART\"}",
+      "prev_hash": "df4ed989fe5ff178ed9019ba407c18469ccecfac707a98d2cdacf52c28d30f36",
+      "ts": 1791275451.1884155
+    },
+    {
+      "action": "INCIDENT_OPENED",
+      "actor": "system",
+      "channel": "SECURITY",
+      "command_id": "CMD-37176AB298B8",
+      "device_id": "DEV-A2",
+      "hash": "8d1173fe7f810f015601e25ec28b01f6f842b7b619dc6ee28191f95865044a33",
+      "id": 36,
+      "payload": "{\"command_id\": \"CMD-37176AB298B8\", \"device_id\": \"DEV-A2\", \"digest\": \"eb57dee3e807746813250fedb899c3d02403420dfb9324d4d087f105c7e9719b\", \"dispatched_boot\": \"BOOT-E2E7C743A6E3DBF9B186\", \"incident_id\": \"INC-A54923F79FEF\", \"reason\": \"GATEWAY_RESTART\"}",
+      "prev_hash": "c971bc5aad332c1507517ce67ab722052400aaa184535fc9fd4b7ff2162362ba",
+      "ts": 1791275451.1884155
+    },
+    {
+      "action": "GATEWAY_RESTART_RECOVERY",
+      "actor": "system",
+      "channel": "SYSTEM",
+      "command_id": null,
+      "device_id": null,
+      "hash": "dd3b2263df48b8f285e229ca127874ac83372a5dbbef1bf0e745b8a6c815100e",
+      "id": 37,
+      "payload": "{\"doubt_targets\": [{\"command_id\": \"CMD-99097DC9F814\", \"device_id\": \"DEV-A1\", \"dispatched_boot\": \"BOOT-D96E5EE58895ADBD0FDD\"}, {\"command_id\": \"CMD-37176AB298B8\", \"device_id\": \"DEV-A2\", \"dispatched_boot\": \"BOOT-E2E7C743A6E3DBF9B186\"}], \"incidents_opened\": 2}",
+      "prev_hash": "8d1173fe7f810f015601e25ec28b01f6f842b7b619dc6ee28191f95865044a33",
+      "ts": 1791275451.1884155
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A2",
+      "hash": "7a10a46c53f20998cc03396636f1461e7f0965d58ab3fb84ad1cc750ddfc0be8",
+      "id": 38,
+      "payload": "{\"boot_code\": \"BOOT-E2E7C743A6E3DBF9B186\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 2, \"rebooted\": false}",
+      "prev_hash": "dd3b2263df48b8f285e229ca127874ac83372a5dbbef1bf0e745b8a6c815100e",
+      "ts": 1791275451.6125517
+    },
+    {
+      "action": "LEDGER_RECOVERY",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": "CMD-37176AB298B8",
+      "device_id": "DEV-A2",
+      "hash": "34db1a3b84198d8c9bd5f8da6f183d285b76c8201abaf1a179d5e1fc6937ef33",
+      "id": 39,
+      "payload": "{\"boot_code\": \"BOOT-E2E7C743A6E3DBF9B186\", \"command_id\": \"CMD-37176AB298B8\", \"digest\": \"eb57dee3e807746813250fedb899c3d02403420dfb9324d4d087f105c7e9719b\", \"entry_hash\": \"1573e6ec7ff2fd2299d7c28d40430d6f91918b80a5db26d456d610dd94475ad2\", \"message\": \"done\", \"prev_hash\": \"7f9e85de36662777d1c0e7c5f28b66b93c19f2f4b6557a904da59919f8384325\", \"result\": \"EXECUTED\", \"seq\": 1}",
+      "prev_hash": "7a10a46c53f20998cc03396636f1461e7f0965d58ab3fb84ad1cc750ddfc0be8",
+      "ts": 1791275451.6125517
+    },
+    {
+      "action": "LEDGER_RECONCILED",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A2",
+      "hash": "d00a34dd7671b4e2bdba1ff15fe1c9b6ddcd5eec6303d504fb470364acb0a6e3",
+      "id": 40,
+      "payload": "{\"accepted\": [{\"command_id\": \"CMD-D53C8F2B030D\", \"duplicate\": true, \"result\": \"EXECUTED\"}, {\"command_id\": \"CMD-37176AB298B8\", \"result\": \"EXECUTED\"}], \"quarantined\": [], \"upload_hash\": \"15aef19568f06699073e3c4674dfe55e01569e76e36ccd987f12eb9d7221f464\"}",
+      "prev_hash": "34db1a3b84198d8c9bd5f8da6f183d285b76c8201abaf1a179d5e1fc6937ef33",
+      "ts": 1791275451.6125517
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-287D14B6A25B",
+      "device_id": null,
+      "hash": "f5bea956b2a6eb478b8ed52a203e9cf4b54d85c593832e376bf87b6b6f421732",
+      "id": 41,
+      "payload": "{\"command_id\": \"CMD-287D14B6A25B\", \"confirm_deadline\": 1791275511.6207368, \"digest\": \"a0f17b602dad1985781df8c40dfa5b944b92dd52391b504a24cec3d7f9948a13\", \"frozen\": {\"action\": \"OPEN_BYPASS\", \"devices\": [\"DEV-B1\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275451.6207368, \"valid_to\": 1791275571.6207368}}",
+      "prev_hash": "d00a34dd7671b4e2bdba1ff15fe1c9b6ddcd5eec6303d504fb470364acb0a6e3",
+      "ts": 1791275451.6207368
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-287D14B6A25B",
+      "device_id": null,
+      "hash": "8b04210cef26f2d1ea81061b61ae5d46975617c4f8d9a221157cb19c430a6a2f",
+      "id": 42,
+      "payload": "{\"command_id\": \"CMD-287D14B6A25B\", \"digest\": \"a0f17b602dad1985781df8c40dfa5b944b92dd52391b504a24cec3d7f9948a13\"}",
+      "prev_hash": "f5bea956b2a6eb478b8ed52a203e9cf4b54d85c593832e376bf87b6b6f421732",
+      "ts": 1791275451.623395
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-B1",
+      "hash": "54d1f202b48a74050d6b887ab9e515b4f9439ccbfab007abf277da71b15fd6d8",
+      "id": 43,
+      "payload": "{\"boot_code\": \"BOOT-10267327AB6BF104122C\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": false}",
+      "prev_hash": "8b04210cef26f2d1ea81061b61ae5d46975617c4f8d9a221157cb19c430a6a2f",
+      "ts": 1791275451.6278958
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": "CMD-287D14B6A25B",
+      "device_id": "DEV-B1",
+      "hash": "48eb4cc41cc30b23ac620f7271b6835bc4343b47b85687ca52100d974ddf37ea",
+      "id": 44,
+      "payload": "{\"boot_code\": \"BOOT-10267327AB6BF104122C\", \"command_id\": \"CMD-287D14B6A25B\", \"digest\": \"a0f17b602dad1985781df8c40dfa5b944b92dd52391b504a24cec3d7f9948a13\"}",
+      "prev_hash": "54d1f202b48a74050d6b887ab9e515b4f9439ccbfab007abf277da71b15fd6d8",
+      "ts": 1791275451.6309059
+    },
+    {
+      "action": "INCIDENT_OPENED",
+      "actor": "system",
+      "channel": "SECURITY",
+      "command_id": "CMD-287D14B6A25B",
+      "device_id": "DEV-B1",
+      "hash": "7b2ca21b6af1f06285b023d375a4cd8f71c112a4085d3c9f079b584e7d798783",
+      "id": 45,
+      "payload": "{\"command_id\": \"CMD-287D14B6A25B\", \"device_id\": \"DEV-B1\", \"digest\": \"a0f17b602dad1985781df8c40dfa5b944b92dd52391b504a24cec3d7f9948a13\", \"dispatched_boot\": \"BOOT-10267327AB6BF104122C\", \"incident_id\": \"INC-EB9E2153D186\", \"reason\": \"GATEWAY_RESTART\"}",
+      "prev_hash": "48eb4cc41cc30b23ac620f7271b6835bc4343b47b85687ca52100d974ddf37ea",
+      "ts": 1791275452.342842
+    },
+    {
+      "action": "GATEWAY_RESTART_RECOVERY",
+      "actor": "system",
+      "channel": "SYSTEM",
+      "command_id": null,
+      "device_id": null,
+      "hash": "fee391102511202429b07d4670ada9c67a094243349f9671d9415ef47d680a37",
+      "id": 46,
+      "payload": "{\"doubt_targets\": [{\"command_id\": \"CMD-287D14B6A25B\", \"device_id\": \"DEV-B1\", \"dispatched_boot\": \"BOOT-10267327AB6BF104122C\"}], \"incidents_opened\": 1}",
+      "prev_hash": "7b2ca21b6af1f06285b023d375a4cd8f71c112a4085d3c9f079b584e7d798783",
+      "ts": 1791275452.342842
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-B1",
+      "hash": "6a43a414c9649eb36a14415c01ed964022106d19660b39a7aba7e20b755635f0",
+      "id": 47,
+      "payload": "{\"boot_code\": \"BOOT-479867D697D722C9E92F\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": true}",
+      "prev_hash": "fee391102511202429b07d4670ada9c67a094243349f9671d9415ef47d680a37",
+      "ts": 1791275452.6591043
+    },
+    {
+      "action": "REDELIVER_AFTER_REBOOT",
+      "actor": "DEV-B1",
+      "channel": "SYSTEM",
+      "command_id": "CMD-287D14B6A25B",
+      "device_id": "DEV-B1",
+      "hash": "47f6ab1739f5c466a9b439788545c8595da9ad8c5ef93496a899c486dfc81e62",
+      "id": 48,
+      "payload": "{\"command_id\": \"CMD-287D14B6A25B\", \"new_boot\": \"BOOT-479867D697D722C9E92F\", \"old_boot\": \"BOOT-10267327AB6BF104122C\"}",
+      "prev_hash": "6a43a414c9649eb36a14415c01ed964022106d19660b39a7aba7e20b755635f0",
+      "ts": 1791275452.6591043
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": "CMD-287D14B6A25B",
+      "device_id": "DEV-B1",
+      "hash": "4d0e186b0bd76bb9bbdcc9d11fbe02a26f30a269286a861ea1745a824483089a",
+      "id": 49,
+      "payload": "{\"boot_code\": \"BOOT-479867D697D722C9E92F\", \"command_id\": \"CMD-287D14B6A25B\", \"digest\": \"a0f17b602dad1985781df8c40dfa5b944b92dd52391b504a24cec3d7f9948a13\"}",
+      "prev_hash": "47f6ab1739f5c466a9b439788545c8595da9ad8c5ef93496a899c486dfc81e62",
+      "ts": 1791275452.6623816
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-E1F92096C05D",
+      "device_id": null,
+      "hash": "76cdb1ee06b77abb31f355029aa3d4c18e37f703ee33d916dba5a7e7bb634bb4",
+      "id": 50,
+      "payload": "{\"command_id\": \"CMD-E1F92096C05D\", \"confirm_deadline\": 1791275455.663972, \"digest\": \"9a7a452eed55332852f1c36378ae49f047fb58b3ac2969aa9d2cea4bda10da78\", \"frozen\": {\"action\": \"OPEN_BYPASS\", \"devices\": [\"DEV-B1\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275452.663972, \"valid_to\": 1791275455.663972}}",
+      "prev_hash": "4d0e186b0bd76bb9bbdcc9d11fbe02a26f30a269286a861ea1745a824483089a",
+      "ts": 1791275452.663972
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-E1F92096C05D",
+      "device_id": null,
+      "hash": "1266274c6b97d71924071135e8cc0ec553f558c48c5da199a8902913e878324d",
+      "id": 51,
+      "payload": "{\"command_id\": \"CMD-E1F92096C05D\", \"digest\": \"9a7a452eed55332852f1c36378ae49f047fb58b3ac2969aa9d2cea4bda10da78\"}",
+      "prev_hash": "76cdb1ee06b77abb31f355029aa3d4c18e37f703ee33d916dba5a7e7bb634bb4",
+      "ts": 1791275452.6656957
+    },
+    {
+      "action": "DEVICE_OFFLINE",
+      "actor": "system",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A1",
+      "hash": "f2652b570a43a62a7c27ce152e03a4f8e296445001eecb03d76ed1ff5be95338",
+      "id": 52,
+      "payload": "{\"device_id\": \"DEV-A1\", \"last_seen\": 1791275449.8543274}",
+      "prev_hash": "1266274c6b97d71924071135e8cc0ec553f558c48c5da199a8902913e878324d",
+      "ts": 1791275453.9736407
+    },
+    {
+      "action": "DEVICE_OFFLINE",
+      "actor": "system",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A2",
+      "hash": "f5309b1c6be174cd898f0e0dc254e41f78debcda35826f9e3839fc38af52e35e",
+      "id": 53,
+      "payload": "{\"device_id\": \"DEV-A2\", \"last_seen\": 1791275451.6125517}",
+      "prev_hash": "f2652b570a43a62a7c27ce152e03a4f8e296445001eecb03d76ed1ff5be95338",
+      "ts": 1791275455.6214838
+    },
+    {
+      "action": "WINDOW_CLOSED",
+      "actor": "system",
+      "channel": "SYSTEM",
+      "command_id": "CMD-E1F92096C05D",
+      "device_id": null,
+      "hash": "1e8ad63388d8531cba53e494c9e44f2184f46af5dbc2257923a8995e9486802c",
+      "id": 54,
+      "payload": "{\"command_id\": \"CMD-E1F92096C05D\"}",
+      "prev_hash": "f5309b1c6be174cd898f0e0dc254e41f78debcda35826f9e3839fc38af52e35e",
+      "ts": 1791275455.831781
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-B1",
+      "hash": "d4dc3f14e31d6cdedd472d752c126e294d74f15687c80e700210c143d6107857",
+      "id": 55,
+      "payload": "{\"boot_code\": \"BOOT-DA2F976CE389008409F8\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": true}",
+      "prev_hash": "1e8ad63388d8531cba53e494c9e44f2184f46af5dbc2257923a8995e9486802c",
+      "ts": 1791275456.2748048
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-F51C18AFA09A",
+      "device_id": null,
+      "hash": "8446d6e2bedc13707c12ef6d6743ad3f1d06a6c4dcc83cdac79e1455e2be2d10",
+      "id": 56,
+      "payload": "{\"command_id\": \"CMD-F51C18AFA09A\", \"confirm_deadline\": 1791275516.2873926, \"digest\": \"ac36338810cb22076cbf82fe236f18ca4a392614614103fa765e3749b4dd9df7\", \"frozen\": {\"action\": \"EMERGENCY_STOP\", \"devices\": [\"DEV-A1\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275456.2873926, \"valid_to\": 1791275576.2873926}}",
+      "prev_hash": "d4dc3f14e31d6cdedd472d752c126e294d74f15687c80e700210c143d6107857",
+      "ts": 1791275456.2873926
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-F51C18AFA09A",
+      "device_id": null,
+      "hash": "b9fb69646a97b8144593db0d98bb61a61706d90e786fe302c1a430d778759e91",
+      "id": 57,
+      "payload": "{\"command_id\": \"CMD-F51C18AFA09A\", \"digest\": \"ac36338810cb22076cbf82fe236f18ca4a392614614103fa765e3749b4dd9df7\"}",
+      "prev_hash": "8446d6e2bedc13707c12ef6d6743ad3f1d06a6c4dcc83cdac79e1455e2be2d10",
+      "ts": 1791275456.2901607
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A1",
+      "hash": "c4f46800d9c0419dc807c6b97946f79c46f0e5d2d92964670bc647924ec1e165",
+      "id": 58,
+      "payload": "{\"boot_code\": \"BOOT-F6A26D48B5AFAA23C78C\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": true}",
+      "prev_hash": "b9fb69646a97b8144593db0d98bb61a61706d90e786fe302c1a430d778759e91",
+      "ts": 1791275456.2926807
+    },
+    {
+      "action": "REDELIVER_AFTER_REBOOT",
+      "actor": "DEV-A1",
+      "channel": "SYSTEM",
+      "command_id": "CMD-99097DC9F814",
+      "device_id": "DEV-A1",
+      "hash": "c84f01263e002ea4dd4074107ff31da75d15bf31a5c1c96c0597894370a7ae22",
+      "id": 59,
+      "payload": "{\"command_id\": \"CMD-99097DC9F814\", \"new_boot\": \"BOOT-F6A26D48B5AFAA23C78C\", \"old_boot\": \"BOOT-D96E5EE58895ADBD0FDD\"}",
+      "prev_hash": "c4f46800d9c0419dc807c6b97946f79c46f0e5d2d92964670bc647924ec1e165",
+      "ts": 1791275456.2926807
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-99097DC9F814",
+      "device_id": "DEV-A1",
+      "hash": "4362742cc2aa233efdbc571290a9311f78e17e6964fbbf946479b000d634823c",
+      "id": 60,
+      "payload": "{\"boot_code\": \"BOOT-F6A26D48B5AFAA23C78C\", \"command_id\": \"CMD-99097DC9F814\", \"digest\": \"f9b604a26015cfbf2f3d047f3622af02d33e8d63ef397816a84d1aeb979a917e\"}",
+      "prev_hash": "c84f01263e002ea4dd4074107ff31da75d15bf31a5c1c96c0597894370a7ae22",
+      "ts": 1791275456.2951915
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": "CMD-F51C18AFA09A",
+      "device_id": "DEV-A1",
+      "hash": "6b22619e6c4998fd4cc407db53daff4e3ac0dd76f1af349f97859af2e0797188",
+      "id": 61,
+      "payload": "{\"boot_code\": \"BOOT-F6A26D48B5AFAA23C78C\", \"command_id\": \"CMD-F51C18AFA09A\", \"digest\": \"ac36338810cb22076cbf82fe236f18ca4a392614614103fa765e3749b4dd9df7\"}",
+      "prev_hash": "4362742cc2aa233efdbc571290a9311f78e17e6964fbbf946479b000d634823c",
+      "ts": 1791275456.2951915
+    },
+    {
+      "action": "INCIDENT_OPENED",
+      "actor": "system",
+      "channel": "SECURITY",
+      "command_id": "CMD-99097DC9F814",
+      "device_id": "DEV-A1",
+      "hash": "6055eed4ae389a138f37f6d052806d0cd7c77a2908e9876964b19421d3eb9835",
+      "id": 62,
+      "payload": "{\"command_id\": \"CMD-99097DC9F814\", \"device_id\": \"DEV-A1\", \"digest\": \"f9b604a26015cfbf2f3d047f3622af02d33e8d63ef397816a84d1aeb979a917e\", \"dispatched_boot\": \"BOOT-F6A26D48B5AFAA23C78C\", \"incident_id\": \"INC-988E03C5E4C8\", \"reason\": \"GATEWAY_RESTART\"}",
+      "prev_hash": "6b22619e6c4998fd4cc407db53daff4e3ac0dd76f1af349f97859af2e0797188",
+      "ts": 1791275457.5052807
+    },
+    {
+      "action": "INCIDENT_OPENED",
+      "actor": "system",
+      "channel": "SECURITY",
+      "command_id": "CMD-287D14B6A25B",
+      "device_id": "DEV-B1",
+      "hash": "ad460b726422f0d5d08db95e463b0e8fa1dcd4eeec1280d2493aa19a2ba1ead0",
+      "id": 63,
+      "payload": "{\"command_id\": \"CMD-287D14B6A25B\", \"device_id\": \"DEV-B1\", \"digest\": \"a0f17b602dad1985781df8c40dfa5b944b92dd52391b504a24cec3d7f9948a13\", \"dispatched_boot\": \"BOOT-479867D697D722C9E92F\", \"incident_id\": \"INC-0264C80E1E8E\", \"reason\": \"GATEWAY_RESTART\"}",
+      "prev_hash": "6055eed4ae389a138f37f6d052806d0cd7c77a2908e9876964b19421d3eb9835",
+      "ts": 1791275457.5052807
+    },
+    {
+      "action": "INCIDENT_OPENED",
+      "actor": "system",
+      "channel": "SECURITY",
+      "command_id": "CMD-F51C18AFA09A",
+      "device_id": "DEV-A1",
+      "hash": "4721ff89d3ee08d036ccdd443864824630e4be2f9e753889141f2aba39729579",
+      "id": 64,
+      "payload": "{\"command_id\": \"CMD-F51C18AFA09A\", \"device_id\": \"DEV-A1\", \"digest\": \"ac36338810cb22076cbf82fe236f18ca4a392614614103fa765e3749b4dd9df7\", \"dispatched_boot\": \"BOOT-F6A26D48B5AFAA23C78C\", \"incident_id\": \"INC-068CCF8458E3\", \"reason\": \"GATEWAY_RESTART\"}",
+      "prev_hash": "ad460b726422f0d5d08db95e463b0e8fa1dcd4eeec1280d2493aa19a2ba1ead0",
+      "ts": 1791275457.5052807
+    },
+    {
+      "action": "GATEWAY_RESTART_RECOVERY",
+      "actor": "system",
+      "channel": "SYSTEM",
+      "command_id": null,
+      "device_id": null,
+      "hash": "664104151963e22a3f0cc1ad5354315c275332c62aed1ef70d05b79d57ff56cd",
+      "id": 65,
+      "payload": "{\"doubt_targets\": [{\"command_id\": \"CMD-99097DC9F814\", \"device_id\": \"DEV-A1\", \"dispatched_boot\": \"BOOT-F6A26D48B5AFAA23C78C\"}, {\"command_id\": \"CMD-287D14B6A25B\", \"device_id\": \"DEV-B1\", \"dispatched_boot\": \"BOOT-479867D697D722C9E92F\"}, {\"command_id\": \"CMD-F51C18AFA09A\", \"device_id\": \"DEV-A1\", \"dispatched_boot\": \"BOOT-F6A26D48B5AFAA23C78C\"}], \"incidents_opened\": 3}",
+      "prev_hash": "4721ff89d3ee08d036ccdd443864824630e4be2f9e753889141f2aba39729579",
+      "ts": 1791275457.5052807
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A1",
+      "hash": "dbb99a47f4c9fa8c3d5525318f7e7c40233cf13e12b8185c02c5070c450cf326",
+      "id": 66,
+      "payload": "{\"boot_code\": \"BOOT-5033353FEFCCC5861382\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 1, \"rebooted\": true}",
+      "prev_hash": "664104151963e22a3f0cc1ad5354315c275332c62aed1ef70d05b79d57ff56cd",
+      "ts": 1791275457.822427
+    },
+    {
+      "action": "LEDGER_SIGNATURE_INVALID",
+      "actor": "DEV-A1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A1",
+      "hash": "72bbcc42d1c6097811fb59706aa805442264b28f66f5328208e78e56c593f489",
+      "id": 67,
+      "payload": "{\"entries\": 1, \"upload_hash\": \"0b6c2914eb518f4b37215854279d4c7a6edc4b6e2214c4148ee19e1bc88b0332\"}",
+      "prev_hash": "dbb99a47f4c9fa8c3d5525318f7e7c40233cf13e12b8185c02c5070c450cf326",
+      "ts": 1791275457.822427
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-35C8D816A5C7",
+      "device_id": null,
+      "hash": "bd6f8ddabb5dd2ee0405936e8391b4a2ee5f3f71cea07fa4e30d996ac048ddfc",
+      "id": 68,
+      "payload": "{\"command_id\": \"CMD-35C8D816A5C7\", \"confirm_deadline\": 1791275517.8273754, \"digest\": \"76c8cefde86f2a0a593422cb8c41eb66faefa5760c82aaddef86ea3443e46cf7\", \"frozen\": {\"action\": \"EMERGENCY_STOP\", \"devices\": [\"DEV-A2\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275457.8273754, \"valid_to\": 1791275577.8273754}}",
+      "prev_hash": "72bbcc42d1c6097811fb59706aa805442264b28f66f5328208e78e56c593f489",
+      "ts": 1791275457.8273754
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-35C8D816A5C7",
+      "device_id": null,
+      "hash": "a94e29b467f0b486d5e38f8ed08e4acbb2c098d9498f7b869088a1b2e1de6262",
+      "id": 69,
+      "payload": "{\"command_id\": \"CMD-35C8D816A5C7\", \"digest\": \"76c8cefde86f2a0a593422cb8c41eb66faefa5760c82aaddef86ea3443e46cf7\"}",
+      "prev_hash": "bd6f8ddabb5dd2ee0405936e8391b4a2ee5f3f71cea07fa4e30d996ac048ddfc",
+      "ts": 1791275457.8293374
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A2",
+      "hash": "00de9e2bd2c8427f8c1dd28c1839fd8c3b5081814b103a3a57057e55e35156b4",
+      "id": 70,
+      "payload": "{\"boot_code\": \"BOOT-B8489409677BF9C3C493\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": true}",
+      "prev_hash": "a94e29b467f0b486d5e38f8ed08e4acbb2c098d9498f7b869088a1b2e1de6262",
+      "ts": 1791275457.8309715
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": "CMD-35C8D816A5C7",
+      "device_id": "DEV-A2",
+      "hash": "6a46149200586f6507999b8e120116e6795dab6f3251d8173da9293003ad1089",
+      "id": 71,
+      "payload": "{\"boot_code\": \"BOOT-B8489409677BF9C3C493\", \"command_id\": \"CMD-35C8D816A5C7\", \"digest\": \"76c8cefde86f2a0a593422cb8c41eb66faefa5760c82aaddef86ea3443e46cf7\"}",
+      "prev_hash": "00de9e2bd2c8427f8c1dd28c1839fd8c3b5081814b103a3a57057e55e35156b4",
+      "ts": 1791275457.8325589
+    },
+    {
+      "action": "INCIDENT_OPENED",
+      "actor": "system",
+      "channel": "SECURITY",
+      "command_id": "CMD-35C8D816A5C7",
+      "device_id": "DEV-A2",
+      "hash": "dccc456b2d3daae72865c11a3f3c81d9a24d6f8dc0cf2a3676745d8d8bf07f99",
+      "id": 72,
+      "payload": "{\"command_id\": \"CMD-35C8D816A5C7\", \"device_id\": \"DEV-A2\", \"digest\": \"76c8cefde86f2a0a593422cb8c41eb66faefa5760c82aaddef86ea3443e46cf7\", \"dispatched_boot\": \"BOOT-B8489409677BF9C3C493\", \"incident_id\": \"INC-CCE62EC2CB3C\", \"reason\": \"GATEWAY_RESTART\"}",
+      "prev_hash": "6a46149200586f6507999b8e120116e6795dab6f3251d8173da9293003ad1089",
+      "ts": 1791275459.0494497
+    },
+    {
+      "action": "GATEWAY_RESTART_RECOVERY",
+      "actor": "system",
+      "channel": "SYSTEM",
+      "command_id": null,
+      "device_id": null,
+      "hash": "ddccd9b6871c856e88a7d4a0d3434b513ecf2fd1cb7ba581214c4a02b405d7a6",
+      "id": 73,
+      "payload": "{\"doubt_targets\": [{\"command_id\": \"CMD-35C8D816A5C7\", \"device_id\": \"DEV-A2\", \"dispatched_boot\": \"BOOT-B8489409677BF9C3C493\"}], \"incidents_opened\": 1}",
+      "prev_hash": "dccc456b2d3daae72865c11a3f3c81d9a24d6f8dc0cf2a3676745d8d8bf07f99",
+      "ts": 1791275459.0494497
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A2",
+      "hash": "ee59eb37793257fe9fcf88bb1bbdbaf57bad09322c8d8b76e86e0b333568d534",
+      "id": 74,
+      "payload": "{\"boot_code\": \"BOOT-74AC8AAA59B2A067B352\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 1, \"rebooted\": true}",
+      "prev_hash": "ddccd9b6871c856e88a7d4a0d3434b513ecf2fd1cb7ba581214c4a02b405d7a6",
+      "ts": 1791275459.365209
+    },
+    {
+      "action": "LEDGER_RECONCILED",
+      "actor": "DEV-A2",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-A2",
+      "hash": "8a4d2bb8fa891a29236c63adee47248388b2c554762c5969e0fec1ddf489b185",
+      "id": 75,
+      "payload": "{\"accepted\": [], \"quarantined\": [{\"boot_code\": \"BOOT-B8489409677BF9C3C493\", \"command_id\": \"CMD-35C8D816A5C7\", \"reason\": \"FINGERPRINT_MISMATCH\", \"seq\": 1}], \"upload_hash\": \"d73d6fabcc812e0380eea48497f1ba261f128d0f43cc5cc93cb489ec029245ae\"}",
+      "prev_hash": "ee59eb37793257fe9fcf88bb1bbdbaf57bad09322c8d8b76e86e0b333568d534",
+      "ts": 1791275459.365209
+    },
+    {
+      "action": "CMD_CREATED",
+      "actor": "biz-system",
+      "channel": "BIZ",
+      "command_id": "CMD-7C64A90C4DEB",
+      "device_id": null,
+      "hash": "f644adfe5c6ff463fb67513a8efc1ccd00724ecb2ece23e38e2a9d4cafed2a84",
+      "id": 76,
+      "payload": "{\"command_id\": \"CMD-7C64A90C4DEB\", \"confirm_deadline\": 1791275519.3701203, \"digest\": \"dc9c279a4a10438fafbd5a5140e85c75d950fe3092285b7788ccd763158d9b83\", \"frozen\": {\"action\": \"OPEN_BYPASS\", \"devices\": [\"DEV-B1\"], \"params\": {\"rpm\": 0, \"valve\": \"CLOSE\"}, \"valid_from\": 1791275459.3701203, \"valid_to\": 1791275579.3701203}}",
+      "prev_hash": "8a4d2bb8fa891a29236c63adee47248388b2c554762c5969e0fec1ddf489b185",
+      "ts": 1791275459.3701203
+    },
+    {
+      "action": "CMD_CONFIRMED",
+      "actor": "supervisor",
+      "channel": "SECURITY",
+      "command_id": "CMD-7C64A90C4DEB",
+      "device_id": null,
+      "hash": "cf17af6316322ce294e87a2f65c217c455c92709a8029673b4901801c4bda390",
+      "id": 77,
+      "payload": "{\"command_id\": \"CMD-7C64A90C4DEB\", \"digest\": \"dc9c279a4a10438fafbd5a5140e85c75d950fe3092285b7788ccd763158d9b83\"}",
+      "prev_hash": "f644adfe5c6ff463fb67513a8efc1ccd00724ecb2ece23e38e2a9d4cafed2a84",
+      "ts": 1791275459.373097
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-B1",
+      "hash": "9cbebcc49bf3016448ae14117c63eae215796044720e7add897582f4b1ecbcfc",
+      "id": 78,
+      "payload": "{\"boot_code\": \"BOOT-AEF927E330E40B108DC2\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 0, \"rebooted\": true}",
+      "prev_hash": "cf17af6316322ce294e87a2f65c217c455c92709a8029673b4901801c4bda390",
+      "ts": 1791275459.374868
+    },
+    {
+      "action": "REDELIVER_AFTER_REBOOT",
+      "actor": "DEV-B1",
+      "channel": "SYSTEM",
+      "command_id": "CMD-287D14B6A25B",
+      "device_id": "DEV-B1",
+      "hash": "cfe466be2e981f9960e4217c8fa9b0002bbd2d7700fe9baf3d18269098307844",
+      "id": 79,
+      "payload": "{\"command_id\": \"CMD-287D14B6A25B\", \"new_boot\": \"BOOT-AEF927E330E40B108DC2\", \"old_boot\": \"BOOT-479867D697D722C9E92F\"}",
+      "prev_hash": "9cbebcc49bf3016448ae14117c63eae215796044720e7add897582f4b1ecbcfc",
+      "ts": 1791275459.374868
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": "CMD-287D14B6A25B",
+      "device_id": "DEV-B1",
+      "hash": "e2519bb3f30bc553a858de01e6b4a31bc1c1b95262a0af6d26ab87a953544c8b",
+      "id": 80,
+      "payload": "{\"boot_code\": \"BOOT-AEF927E330E40B108DC2\", \"command_id\": \"CMD-287D14B6A25B\", \"digest\": \"a0f17b602dad1985781df8c40dfa5b944b92dd52391b504a24cec3d7f9948a13\"}",
+      "prev_hash": "cfe466be2e981f9960e4217c8fa9b0002bbd2d7700fe9baf3d18269098307844",
+      "ts": 1791275459.37632
+    },
+    {
+      "action": "COMMAND_DISPATCHED",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": "CMD-7C64A90C4DEB",
+      "device_id": "DEV-B1",
+      "hash": "4de188d9486368d869d0fb5f02948594a3b15fb302986caea2fa1540fbe05ea3",
+      "id": 81,
+      "payload": "{\"boot_code\": \"BOOT-AEF927E330E40B108DC2\", \"command_id\": \"CMD-7C64A90C4DEB\", \"digest\": \"dc9c279a4a10438fafbd5a5140e85c75d950fe3092285b7788ccd763158d9b83\"}",
+      "prev_hash": "e2519bb3f30bc553a858de01e6b4a31bc1c1b95262a0af6d26ab87a953544c8b",
+      "ts": 1791275459.37632
+    },
+    {
+      "action": "INCIDENT_OPENED",
+      "actor": "system",
+      "channel": "SECURITY",
+      "command_id": "CMD-287D14B6A25B",
+      "device_id": "DEV-B1",
+      "hash": "729c9c2f5c46d07a322270c874325e0ac729e7587a35549bec1ae637de0f09b8",
+      "id": 82,
+      "payload": "{\"command_id\": \"CMD-287D14B6A25B\", \"device_id\": \"DEV-B1\", \"digest\": \"a0f17b602dad1985781df8c40dfa5b944b92dd52391b504a24cec3d7f9948a13\", \"dispatched_boot\": \"BOOT-AEF927E330E40B108DC2\", \"incident_id\": \"INC-F6DB07E51C91\", \"reason\": \"GATEWAY_RESTART\"}",
+      "prev_hash": "4de188d9486368d869d0fb5f02948594a3b15fb302986caea2fa1540fbe05ea3",
+      "ts": 1791275460.0866354
+    },
+    {
+      "action": "INCIDENT_OPENED",
+      "actor": "system",
+      "channel": "SECURITY",
+      "command_id": "CMD-7C64A90C4DEB",
+      "device_id": "DEV-B1",
+      "hash": "fd3a809a053f4a5530c91ec9519dc9bde46fa9d8d2cce5aa696695e3edba4b8c",
+      "id": 83,
+      "payload": "{\"command_id\": \"CMD-7C64A90C4DEB\", \"device_id\": \"DEV-B1\", \"digest\": \"dc9c279a4a10438fafbd5a5140e85c75d950fe3092285b7788ccd763158d9b83\", \"dispatched_boot\": \"BOOT-AEF927E330E40B108DC2\", \"incident_id\": \"INC-458658F231D7\", \"reason\": \"GATEWAY_RESTART\"}",
+      "prev_hash": "729c9c2f5c46d07a322270c874325e0ac729e7587a35549bec1ae637de0f09b8",
+      "ts": 1791275460.0866354
+    },
+    {
+      "action": "GATEWAY_RESTART_RECOVERY",
+      "actor": "system",
+      "channel": "SYSTEM",
+      "command_id": null,
+      "device_id": null,
+      "hash": "ba4d78d38102a8b4683d5051477c50aab6fd026606c8085ad106707a07063204",
+      "id": 84,
+      "payload": "{\"doubt_targets\": [{\"command_id\": \"CMD-287D14B6A25B\", \"device_id\": \"DEV-B1\", \"dispatched_boot\": \"BOOT-AEF927E330E40B108DC2\"}, {\"command_id\": \"CMD-7C64A90C4DEB\", \"device_id\": \"DEV-B1\", \"dispatched_boot\": \"BOOT-AEF927E330E40B108DC2\"}], \"incidents_opened\": 2}",
+      "prev_hash": "fd3a809a053f4a5530c91ec9519dc9bde46fa9d8d2cce5aa696695e3edba4b8c",
+      "ts": 1791275460.0866354
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-B1",
+      "hash": "4b4f8b86e80fafdfeb02e4a5baa716604a47b992717a1655750c4cda0abbe8af",
+      "id": 85,
+      "payload": "{\"boot_code\": \"BOOT-6C9F19B7C16A2879E90F\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 1, \"rebooted\": true}",
+      "prev_hash": "ba4d78d38102a8b4683d5051477c50aab6fd026606c8085ad106707a07063204",
+      "ts": 1791275460.3982341
+    },
+    {
+      "action": "LEDGER_RECONCILED",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-B1",
+      "hash": "a99401181dbf7b98d6119a1b7e3bc7a6db75f1b80b329fb96f866faed2e8f807",
+      "id": 86,
+      "payload": "{\"accepted\": [], \"quarantined\": [{\"boot_code\": \"BOOT-AEF927E330E40B108DC2\", \"command_id\": \"CMD-7C64A90C4DEB\", \"reason\": \"SEQ_GAP\", \"seq\": 2}], \"upload_hash\": \"c27389021c445e6ef389085175a4ab7cd444b1fabe7f4922d46792cf22a0a472\"}",
+      "prev_hash": "4b4f8b86e80fafdfeb02e4a5baa716604a47b992717a1655750c4cda0abbe8af",
+      "ts": 1791275460.3982341
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-B1",
+      "hash": "63eb050b6cf4451596b76d1fa8aecdfa8bd8693aff47cea7d79eabb5e6a03575",
+      "id": 87,
+      "payload": "{\"boot_code\": \"BOOT-AEF927E330E40B108DC2\", \"first_seq\": 1, \"ledger_duplicate\": false, \"ledger_entries\": 1, \"rebooted\": true}",
+      "prev_hash": "a99401181dbf7b98d6119a1b7e3bc7a6db75f1b80b329fb96f866faed2e8f807",
+      "ts": 1791275460.4041872
+    },
+    {
+      "action": "LEDGER_RECOVERY",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": "CMD-7C64A90C4DEB",
+      "device_id": "DEV-B1",
+      "hash": "0bac95668723ce9f03f447bbf47aec403d92cbc1a5521e2299dfea938421a45e",
+      "id": 88,
+      "payload": "{\"boot_code\": \"BOOT-AEF927E330E40B108DC2\", \"command_id\": \"CMD-7C64A90C4DEB\", \"digest\": \"dc9c279a4a10438fafbd5a5140e85c75d950fe3092285b7788ccd763158d9b83\", \"entry_hash\": \"ae0d9237727267a3acef56d3dec57697c767df264cb056bafe500124c10793ea\", \"message\": \"actuated\", \"prev_hash\": \"9bb8c0f7d26a0173d07943fed25246d08082651d7de335e5c6b41cc778d79b17\", \"result\": \"EXECUTED\", \"seq\": 1}",
+      "prev_hash": "63eb050b6cf4451596b76d1fa8aecdfa8bd8693aff47cea7d79eabb5e6a03575",
+      "ts": 1791275460.4041872
+    },
+    {
+      "action": "LEDGER_RECONCILED",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-B1",
+      "hash": "2d12301a0589813bba00a1f06156df3e7170f64ad64d82b04c9715a9982f95ee",
+      "id": 89,
+      "payload": "{\"accepted\": [{\"command_id\": \"CMD-7C64A90C4DEB\", \"result\": \"EXECUTED\"}], \"quarantined\": [], \"upload_hash\": \"f62c2de1f5d631d65b2bc9456a04434357a5764fac42d5c73af12385e8f719db\"}",
+      "prev_hash": "0bac95668723ce9f03f447bbf47aec403d92cbc1a5521e2299dfea938421a45e",
+      "ts": 1791275460.4041872
+    },
+    {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "command_id": null,
+      "device_id": "DEV-B1",
+      "hash": "56ef8c7837a91d867ded76ef273b3161ee526d957b0e9e3102c6e8d8e1a3e9c2",
+      "id": 90,
+      "payload": "{\"boot_code\": \"BOOT-AEF927E330E40B108DC2\", \"first_seq\": 1, \"ledger_duplicate\": true, \"ledger_entries\": 1, \"rebooted\": false}",
+      "prev_hash": "2d12301a0589813bba00a1f06156df3e7170f64ad64d82b04c9715a9982f95ee",
+      "ts": 1791275460.409627
+    }
+  ],
+  "manifest": {
+    "anchor": "95d5fe04321ac04a35a1c9b3d67ce764445f6564488d178f917496c9222bf1af",
+    "count": 90,
+    "created_by": "supervisor",
+    "first_hash": "9b0f4a3b3c778065af641b8bcb3f81a4facc4b61da1ddd244f999222252a2b14",
+    "from_id": 1,
+    "last_hash": "56ef8c7837a91d867ded76ef273b3161ee526d957b0e9e3102c6e8d8e1a3e9c2",
+    "last_summary": {
+      "action": "DEVICE_HELLO",
+      "actor": "DEV-B1",
+      "channel": "DEVICE",
+      "hash": "56ef8c7837a91d867ded76ef273b3161ee526d957b0e9e3102c6e8d8e1a3e9c2",
+      "id": 90,
+      "prev_hash": "2d12301a0589813bba00a1f06156df3e7170f64ad64d82b04c9715a9982f95ee",
+      "ts": 1791275460.409627
+    },
+    "prior_head": "0000000000000000000000000000000000000000000000000000000000000000",
+    "proofs_head": "a658ad0b3226bf6e8a3ec6ed49c0089272cf84da7443daaa7e243de3484d7b8a",
+    "seal_id": "SEAL-8129171613EB",
+    "sealed_at": 1791275460.409627,
+    "to_id": 90,
+    "version": "gw-seal/v1"
+  },
+  "manifest_hash": "b3d105260f7086112b2613a47e665c93e97c9ea04c7ca6141ff284b4eb3f642b",
+  "package_hash": "ff661b796e1500a7743eeb2dd428c49d51c869cdf581aa1e22cf7d1caa1c2ac6",
+  "package_sig": "0321755ce89766a87d7c7a78917958d5f72778e61a2984922375a15a68d8e861",
+  "proofs": [
+    {
+      "event_id": 1,
+      "payload_hash": "384994dac473fc91225af56893867d4611f0b234eab7f7f80e5caefd9ae770fe",
+      "position": 1,
+      "prev_proof": "0000000000000000000000000000000000000000000000000000000000000000",
+      "proof": "6e4a34d86c32f5b504a6a76d9018f349b6feca5c3809ec48e3bab874b5ef5d8e",
+      "record_hash": "93c5ef2846efe2024e19618afe8970aa4fd7e07544d94069d278d93ac4348367"
+    },
+    {
+      "event_id": 2,
+      "payload_hash": "078f62d3debded7950bbfc98a1925d10d034d73140eeb6570d34450930d7a7a8",
+      "position": 2,
+      "prev_proof": "6e4a34d86c32f5b504a6a76d9018f349b6feca5c3809ec48e3bab874b5ef5d8e",
+      "proof": "af3b7e6768f3215794f6d71d028a25501357a429ffe5cfe1c9b9636140a8f0c2",
+      "record_hash": "9b55170879914042607a0f313dbb173baba1ea19aadcd2bd59324521d75c56f9"
+    },
+    {
+      "event_id": 3,
+      "payload_hash": "fe533e76a66f1d7c02ee1f1622d92ba44853f42a2069fae0f0dd9224937a6e03",
+      "position": 3,
+      "prev_proof": "af3b7e6768f3215794f6d71d028a25501357a429ffe5cfe1c9b9636140a8f0c2",
+      "proof": "114741eb7dcf702da1e05b5b0fd0351cafa08152eccdf0eb84664289bf6ddf2b",
+      "record_hash": "cf5f854caf6d6f8f99d4f6dec75b65518cb39337aea4f491eb6e8642e7a211e6"
+    },
+    {
+      "event_id": 4,
+      "payload_hash": "84ee0740f5dc13d2d6553f2712bee184f25b8f66f4fb0e461650acf5056474a9",
+      "position": 4,
+      "prev_proof": "114741eb7dcf702da1e05b5b0fd0351cafa08152eccdf0eb84664289bf6ddf2b",
+      "proof": "e7fcc2033853f6a6a873f5a356955b6fb1b6fd02f0f67652f6e2a428bee2cf55",
+      "record_hash": "2a8538a3fd497de28af42c176271a8766fa07ec78fce9d2f3a49dcaef4603d9a"
+    },
+    {
+      "event_id": 5,
+      "payload_hash": "4465fc56516b1d099079439ec239f151c1edff6c36bfc852d30c6901385e0b49",
+      "position": 5,
+      "prev_proof": "e7fcc2033853f6a6a873f5a356955b6fb1b6fd02f0f67652f6e2a428bee2cf55",
+      "proof": "4bb8ea8a05bd9a09f674ffab4e2582eadcb4570b0065edf7f7074812c1efbb96",
+      "record_hash": "5aed3a2f97283f70bd9006a0e0adb688a207a66a4dcda768adc2561c13503d2e"
+    },
+    {
+      "event_id": 6,
+      "payload_hash": "a29c5693ad017b2b9d9fe6d235fe52130e916ab946142a731bd51ee7d7fcdf1b",
+      "position": 6,
+      "prev_proof": "4bb8ea8a05bd9a09f674ffab4e2582eadcb4570b0065edf7f7074812c1efbb96",
+      "proof": "689a1170577cbae59bdc2c961c838f2ccd922a04daafbdbabdd23b489a0436ec",
+      "record_hash": "56847fd77f01194157ceb95565c2cd471b3607bb52b7049cdf0eebf1564b672c"
+    },
+    {
+      "event_id": 7,
+      "payload_hash": "8f1f409c389a2d224697c0b3d33b1005b8657f926ed7e159feb016b27531e4a2",
+      "position": 7,
+      "prev_proof": "689a1170577cbae59bdc2c961c838f2ccd922a04daafbdbabdd23b489a0436ec",
+      "proof": "e898289d4e90b94629da57672ba5ab497588da6df1bf1279d1a8d9c3990b51ff",
+      "record_hash": "908e48257fd57d1f724405096c569c585c24ccd1ba102ed6c9d02bc708069e52"
+    },
+    {
+      "event_id": 8,
+      "payload_hash": "892cca31813eecedf89932251b41192d09a6f4ce01385cbee3962cc1dadf8958",
+      "position": 8,
+      "prev_proof": "e898289d4e90b94629da57672ba5ab497588da6df1bf1279d1a8d9c3990b51ff",
+      "proof": "4d52f8ff91eab1e1701d6ff7151a92817798232e7a4603c6d9e85d7f6522a85d",
+      "record_hash": "eb00948590bf80e69fea9af20c0a4bb5539581b55332ccfecdab3aa1d863c555"
+    },
+    {
+      "event_id": 9,
+      "payload_hash": "413403c32bd7cfca68a9fd8778334399dc9608d1ed9eb4d95824e91561fa8f89",
+      "position": 9,
+      "prev_proof": "4d52f8ff91eab1e1701d6ff7151a92817798232e7a4603c6d9e85d7f6522a85d",
+      "proof": "26d7dd85fb06b6f2e1093418683feaed83788521d12bb4145e926fcd811c2dbd",
+      "record_hash": "ad513e45c37838b43c0dc5c41a4be1098e5253d47afcad673422919780fc4e80"
+    },
+    {
+      "event_id": 10,
+      "payload_hash": "cc2ef40e8fcab111e3ad08059dda395e1c1e6b3f8a7e8007cda21df2e8e2496b",
+      "position": 10,
+      "prev_proof": "26d7dd85fb06b6f2e1093418683feaed83788521d12bb4145e926fcd811c2dbd",
+      "proof": "cd035fb5b652eca1ece3c7f0078cdd25dc25e93e8ede18c91b04df7c0190ac22",
+      "record_hash": "abc72ee00a5beb1672a092166783b4f05b93c62ffe5ea2e7c46dce289c77beec"
+    },
+    {
+      "event_id": 11,
+      "payload_hash": "39c556b035d40c994323e16c56a241dc4de0240691d22d247ab5e6d90fd2c097",
+      "position": 11,
+      "prev_proof": "cd035fb5b652eca1ece3c7f0078cdd25dc25e93e8ede18c91b04df7c0190ac22",
+      "proof": "f3b9140f35cc77344d5cb986c14a080b0b7c763ca0618f0a2546835cde826345",
+      "record_hash": "c51d13bdb791387a2309eb02f575c84fcaa9e7ae5984d54fba4e3ad8c93e0cde"
+    },
+    {
+      "event_id": 12,
+      "payload_hash": "6a606213cc1e8bc3572cbaf833f96b27dd333c642399694ff6e3ac85573a64d9",
+      "position": 12,
+      "prev_proof": "f3b9140f35cc77344d5cb986c14a080b0b7c763ca0618f0a2546835cde826345",
+      "proof": "4fbf03b8052b9ae98b1f2c905eecf7392245364d5c013c39f8aad3a01bdb6ebd",
+      "record_hash": "cbab4253e195f895efb94618dee4b488e43353322bc6cc42d8d97c52836630a1"
+    },
+    {
+      "event_id": 13,
+      "payload_hash": "cf1f233aa48b753b2282aebc4bbcd36ece928ac2927b3c343d4bd4b0468c04fd",
+      "position": 13,
+      "prev_proof": "4fbf03b8052b9ae98b1f2c905eecf7392245364d5c013c39f8aad3a01bdb6ebd",
+      "proof": "5c85ed5db541a567cec3f4263674393d9efb7d2b6cc0491768be0c13c2695a03",
+      "record_hash": "11be685f6abbc9b60a36b55077d5e2d204985bbe009b0e1522206578530d145a"
+    },
+    {
+      "event_id": 14,
+      "payload_hash": "e63b1d1aae0c9250a5bd79b78a449791ad932af8e2e2d3ab42787a23601b0c7d",
+      "position": 14,
+      "prev_proof": "5c85ed5db541a567cec3f4263674393d9efb7d2b6cc0491768be0c13c2695a03",
+      "proof": "5a4130fcbc0b61810fc8ff3cfca684cd7bf77d29aad9a01b83801a87fb1d2b8b",
+      "record_hash": "75a481e4e1150c555f23e2c3761855981c3035a8ccfd07321e1c31c5466bc516"
+    },
+    {
+      "event_id": 15,
+      "payload_hash": "6f8a8c078dcd75018b5a2fcfe51fbda25fd02db218e189749f3db0dd32b8e5f2",
+      "position": 15,
+      "prev_proof": "5a4130fcbc0b61810fc8ff3cfca684cd7bf77d29aad9a01b83801a87fb1d2b8b",
+      "proof": "a19e419f826f0f0803b84b00fc53581049e2fe9b59d05a9f044e9601a0823950",
+      "record_hash": "298f28139d81813e21225da0c7ce0eeb46a74942e57abcc82a92fb1db194a02c"
+    },
+    {
+      "event_id": 16,
+      "payload_hash": "414ed914a7cc9ceb2dd9c05636ca38712eeac4d5d01203d3b04680bdb39d4f7f",
+      "position": 16,
+      "prev_proof": "a19e419f826f0f0803b84b00fc53581049e2fe9b59d05a9f044e9601a0823950",
+      "proof": "c012a1bc5faf5a4e90d0158df7915406ac7bf5b4a2485333bbaa069a533dc372",
+      "record_hash": "9a44e9f73f558c101a3e65ddda06286b248ae0ae738bd3527c0ce4f7555c35da"
+    },
+    {
+      "event_id": 17,
+      "payload_hash": "33f3515f5259f867107e50dbbd39d3ab15fce9b60e566d8bab0a2d31c78afe49",
+      "position": 17,
+      "prev_proof": "c012a1bc5faf5a4e90d0158df7915406ac7bf5b4a2485333bbaa069a533dc372",
+      "proof": "71a183eb660cc1c4c1812a98a64412c72c16e4184a5b3919c9dedcf5a1841bc4",
+      "record_hash": "c2090970f0b5d4bed3d1042dfb9c80a0b58f23a379bd4ce9e794bd75ce4085ec"
+    },
+    {
+      "event_id": 18,
+      "payload_hash": "08c899bfd4085b52b0bead556067355fd0c6322dcb6f281fcbcb7072197f1840",
+      "position": 18,
+      "prev_proof": "71a183eb660cc1c4c1812a98a64412c72c16e4184a5b3919c9dedcf5a1841bc4",
+      "proof": "4089a8c4a8a86e4cf70d9605c46e1bc8f065fab8fa2911a093c68340f8ae3fab",
+      "record_hash": "5517f20a992eca5d22c4a47b74e18781552816e6f4685536821f6b56f7628d68"
+    },
+    {
+      "event_id": 19,
+      "payload_hash": "333053896744c71a5013f75a746cad3e97e0520f087dc4b2815f35d1e2bcbe93",
+      "position": 19,
+      "prev_proof": "4089a8c4a8a86e4cf70d9605c46e1bc8f065fab8fa2911a093c68340f8ae3fab",
+      "proof": "aa00a729b6c95a4f18013c533d93a2652e32e7085007cc288abb75cc5278467d",
+      "record_hash": "833594034a1fbbf84e21d112af82416f77d9236cd367d9aa48bb8885d6735549"
+    },
+    {
+      "event_id": 20,
+      "payload_hash": "785d5823a8b7d9a8cdae386ee52654aae2399a88dc67a14716f781189704f332",
+      "position": 20,
+      "prev_proof": "aa00a729b6c95a4f18013c533d93a2652e32e7085007cc288abb75cc5278467d",
+      "proof": "fb5b70a4143ebf5459978015ac4e97d2e603924aef609857abef88be8b9e7aec",
+      "record_hash": "32dcda77f3f7d5a3bedc0d2006196e3c66d014cb44c8b74b810d1a91024e0fec"
+    },
+    {
+      "event_id": 21,
+      "payload_hash": "8a538811048fde7bcdb3d96691c4387c58d21b003f580c61edd06e727efa09fa",
+      "position": 21,
+      "prev_proof": "fb5b70a4143ebf5459978015ac4e97d2e603924aef609857abef88be8b9e7aec",
+      "proof": "d9ce92781840d512eaf2c32eb885bf49dbb6d25e90593a7c348aac4ce61d2c27",
+      "record_hash": "d28d346b16ee8df54695acb03b85b0c71f39c01a12f6a91d7b15e9f310664047"
+    },
+    {
+      "event_id": 22,
+      "payload_hash": "6a9f2c7a130200717e8736f4e40a63694d8e31a48868aa34d230d86c7da7e1c5",
+      "position": 22,
+      "prev_proof": "d9ce92781840d512eaf2c32eb885bf49dbb6d25e90593a7c348aac4ce61d2c27",
+      "proof": "9a9c3fcf6be44bf929d4a0508f104ba2e0dda7c1edae98d2ba4249940c561369",
+      "record_hash": "8285397fd832dc559b30e8701d7742d436d0db083f46ba98b5fbdd915cb420dd"
+    },
+    {
+      "event_id": 23,
+      "payload_hash": "f78d20166b8acdfd48f8ef0e9de7c05e9eec1af55ab3b717cec09304da0b829b",
+      "position": 23,
+      "prev_proof": "9a9c3fcf6be44bf929d4a0508f104ba2e0dda7c1edae98d2ba4249940c561369",
+      "proof": "6cb5ce28c68b838c1cbcae185ed4a0085ff07e766c3b4bd4687eecfd1e95b657",
+      "record_hash": "b5ba24e162c7882cc823d4b7e30f55b2f1b5e3100ebb6cefe310953c2953eef0"
+    },
+    {
+      "event_id": 24,
+      "payload_hash": "78ee56c29e79930abdd69f91fbb332f605c7ca09615490b4ee67c80f5a7770b2",
+      "position": 24,
+      "prev_proof": "6cb5ce28c68b838c1cbcae185ed4a0085ff07e766c3b4bd4687eecfd1e95b657",
+      "proof": "455372696ff5e8d58eee8feac2f08b49b6c442b2553d5f4834633d76b195b656",
+      "record_hash": "9c4274a3dfa4ddb942246339cf9cb96ecfbbc000a6fccbe9dffba5e5be5967c4"
+    },
+    {
+      "event_id": 25,
+      "payload_hash": "a99dac9ee84471741dbdd4a6114d4081f2e2d25f7519cf923a2ae2bc66b4a2ec",
+      "position": 25,
+      "prev_proof": "455372696ff5e8d58eee8feac2f08b49b6c442b2553d5f4834633d76b195b656",
+      "proof": "34dcb926cbfd7c809a6fd818399072aaab6de003a1e20a25221a8a510f8b916f",
+      "record_hash": "e0cfed27161ceaf381cfed15841abd3d2ccac5d60aef9f6e9bfdcf96ac328481"
+    },
+    {
+      "event_id": 26,
+      "payload_hash": "34ca0dcb987ce4f098a3d4f7d0c422e62333562b7feb37311f51f3cd0047e080",
+      "position": 26,
+      "prev_proof": "34dcb926cbfd7c809a6fd818399072aaab6de003a1e20a25221a8a510f8b916f",
+      "proof": "ac9054a0ad86cf39462c0219c0fe85cc1ae5b4848ab77e351684ff3b1108f05e",
+      "record_hash": "55d83adfefc788d1b215527e7106c8b0d78799edb4a917fbce21cd45cf4cc1c7"
+    },
+    {
+      "event_id": 27,
+      "payload_hash": "a8c9e53698e02b0f996330f7e6bd59049f5b87b1296a42a35dc3bde81485ccc5",
+      "position": 27,
+      "prev_proof": "ac9054a0ad86cf39462c0219c0fe85cc1ae5b4848ab77e351684ff3b1108f05e",
+      "proof": "39533c156584a348bcfc61b404b5120a7eccab0f36f05b8e3ca10a166a3f0fc5",
+      "record_hash": "f9cb7bf3e37cda01b1a83e9ae3698356647e4906cf3bbbf10a0a86cc7064e5d6"
+    },
+    {
+      "event_id": 28,
+      "payload_hash": "2905b5b5d0c0ff086649ef40d846bdb169e0af066ebe94b6834c7bfe1592eb51",
+      "position": 28,
+      "prev_proof": "39533c156584a348bcfc61b404b5120a7eccab0f36f05b8e3ca10a166a3f0fc5",
+      "proof": "d434dc39772f20ad90b92a3164f0baa9c2ee5c9927572f44ae9571746ab55fae",
+      "record_hash": "39506b7a255682445bae516290702662c6459a733281fe5f75220728d9f83daa"
+    },
+    {
+      "event_id": 29,
+      "payload_hash": "dfb50a97457fd1bdf818f724be58c02c8f6575c2b6557c3668927bfbfe67c1e3",
+      "position": 29,
+      "prev_proof": "d434dc39772f20ad90b92a3164f0baa9c2ee5c9927572f44ae9571746ab55fae",
+      "proof": "55d08f9ff360af2069809517b308ed234ab3e5cacacc5f0f0f70f6cfc9937c32",
+      "record_hash": "fba535755bf8c1fc47424656833ead3f84374e4c2814f56074c25d872802bc0c"
+    },
+    {
+      "event_id": 30,
+      "payload_hash": "9d967d101353b0016d62a895408808ce5cf8fa6050be0824c00d9361301c2ac5",
+      "position": 30,
+      "prev_proof": "55d08f9ff360af2069809517b308ed234ab3e5cacacc5f0f0f70f6cfc9937c32",
+      "proof": "0303b13ad270f0152c8cffb8b51efd5bba9cc27f9febac3d7d9429ff1f2fca79",
+      "record_hash": "63b6644c255384420b797fcc67246d841bda5a385ce0a8e8c296d5a53bccef4e"
+    },
+    {
+      "event_id": 31,
+      "payload_hash": "7332058452ff1774b7edbe0310a80457ceb17b6e2fb00e3113e8092c9cf3799d",
+      "position": 31,
+      "prev_proof": "0303b13ad270f0152c8cffb8b51efd5bba9cc27f9febac3d7d9429ff1f2fca79",
+      "proof": "8f15f9fde31a7a1a8657d7dd3ab87bc068a0c05c767eac7918c6a5ba66308314",
+      "record_hash": "aeae8d288f55bac8cec1f2ae1d4eac1d49f381cb0b913233932ea08b7636b5e1"
+    },
+    {
+      "event_id": 32,
+      "payload_hash": "869118f7bf9b46f2a9a19f1582141bbbf6b6dae9131d11cad0dabc3d9bb7c2ce",
+      "position": 32,
+      "prev_proof": "8f15f9fde31a7a1a8657d7dd3ab87bc068a0c05c767eac7918c6a5ba66308314",
+      "proof": "a716092c9d220387b6125a187bcce7fae56cf419215e816c8ec81cd0af87c01e",
+      "record_hash": "85e447ac0e02c63ef6c1d2cfb79838c19046e1ea6c3ea5566b27637024154525"
+    },
+    {
+      "event_id": 33,
+      "payload_hash": "af5a166f0c348786b51ff1e2e14d708fec4648b5b246beb81e8989df5da75c40",
+      "position": 33,
+      "prev_proof": "a716092c9d220387b6125a187bcce7fae56cf419215e816c8ec81cd0af87c01e",
+      "proof": "7522d3fccc30cadb47ab0f12a85533396da15fbfc83dce3fda37f123113d74ef",
+      "record_hash": "db3fb198d68e73978e68e10ec62408c6bf125b983507970ad465833d43da87b7"
+    },
+    {
+      "event_id": 34,
+      "payload_hash": "30ab4597d785dd8c542e0e8534fa4058f3336740b6b0b31b6be76418842262d0",
+      "position": 34,
+      "prev_proof": "7522d3fccc30cadb47ab0f12a85533396da15fbfc83dce3fda37f123113d74ef",
+      "proof": "9fa6e772d8bd347482dd70aad02fada5680c075a28326a36a71af2c9dc5210f5",
+      "record_hash": "680ffe14e4b17db80fb5f3fe22d7a347403899fa761f81d7e062872457efb865"
+    },
+    {
+      "event_id": 35,
+      "payload_hash": "58d3adb45806edb664df17ad5fdb6147cc8164d02240f008bb8571c800012b52",
+      "position": 35,
+      "prev_proof": "9fa6e772d8bd347482dd70aad02fada5680c075a28326a36a71af2c9dc5210f5",
+      "proof": "309d53cec1a2687557aa38c8b7ce2e7876783321d1e20f57e577d44de9254146",
+      "record_hash": "7765065aac949f1e52a08204f8993e4994f6181d142afab2fa462026eea58ce8"
+    },
+    {
+      "event_id": 36,
+      "payload_hash": "3532632677a5e0d8e9b1b52969ee6e4f658444ff2e289dddd56e12de75cc4725",
+      "position": 36,
+      "prev_proof": "309d53cec1a2687557aa38c8b7ce2e7876783321d1e20f57e577d44de9254146",
+      "proof": "7e07139db2549c58f8cefe5bc9699ec6d1c1bac6f825f94e35cd3ef7172729d0",
+      "record_hash": "734ebe449c885217d4f6d54f1417c1482cd2b1f329e7a55f2477b4a2b8ceabeb"
+    },
+    {
+      "event_id": 37,
+      "payload_hash": "ba0ebc9f1d6ce0562855284bb8ea8fbc0037e4b4705750ced4c3c67261f39f22",
+      "position": 37,
+      "prev_proof": "7e07139db2549c58f8cefe5bc9699ec6d1c1bac6f825f94e35cd3ef7172729d0",
+      "proof": "5c849b70abdbb9a84c6c9ca5dcf7e737a4b07f4e8650105bc172cbf5220b5009",
+      "record_hash": "a643a1be1e375f9ca92c0b7916ec1fe3ce443feded451807ec70cb5698477faa"
+    },
+    {
+      "event_id": 38,
+      "payload_hash": "c44fd2f7b644f2e76cb37511f17e6b0014edce92b179eccea51bd489e199e669",
+      "position": 38,
+      "prev_proof": "5c849b70abdbb9a84c6c9ca5dcf7e737a4b07f4e8650105bc172cbf5220b5009",
+      "proof": "458df9cd5e8ec79ed07b086cd1cc36ffb84f15a67692a110d349f2a42213d56a",
+      "record_hash": "200a9a25896526961733971b9c221ebe1daa8eb5d4dbdb2d0a8e5182e584157c"
+    },
+    {
+      "event_id": 39,
+      "payload_hash": "09486b44080ca1ba4d1b070a8a405dbb7dd515ab996d75c419dfda482bd84405",
+      "position": 39,
+      "prev_proof": "458df9cd5e8ec79ed07b086cd1cc36ffb84f15a67692a110d349f2a42213d56a",
+      "proof": "6e4c49ec817ff53840d330e57a46feda938cbccc87e840d4d223c3cb17c19cae",
+      "record_hash": "51c2d9d9bebb234d7bd871ec6d65eef97efb549187125fa8b59834c0d0ad0d2e"
+    },
+    {
+      "event_id": 40,
+      "payload_hash": "5d6ea6bf9b1192db573b8d1bf62ac240b23e88b273af76cb5d7d45db3ff0e8f2",
+      "position": 40,
+      "prev_proof": "6e4c49ec817ff53840d330e57a46feda938cbccc87e840d4d223c3cb17c19cae",
+      "proof": "d70aebe10425bfc0f0557029aa87cabd39760ec1b2bea2ce41dd49f239919a07",
+      "record_hash": "4e47c25f8f8e931bba45c263178b48b6279558b09cc6e978cc67e5749ed9ec0f"
+    },
+    {
+      "event_id": 41,
+      "payload_hash": "2a7b132fa6ec54d663b150661001fff157b194847f2ef3d437fe84f2652d0df3",
+      "position": 41,
+      "prev_proof": "d70aebe10425bfc0f0557029aa87cabd39760ec1b2bea2ce41dd49f239919a07",
+      "proof": "b2c876fc97582fc0d1a485fb9099e1ca4290f8e60ae9a0b2929b5438a9d98460",
+      "record_hash": "09896c472947fc50e6e2ba6512bc4a7df5263aec3b00e6903b0031a21c31283a"
+    },
+    {
+      "event_id": 42,
+      "payload_hash": "8c487834adba9249f5c145cc0a0f29b2025591d21e1bc788769929f5aa1f478f",
+      "position": 42,
+      "prev_proof": "b2c876fc97582fc0d1a485fb9099e1ca4290f8e60ae9a0b2929b5438a9d98460",
+      "proof": "c481c6a8f8b7af5338b6fa6241fa1754ead18abcfe6433b8711489bf9c930b4d",
+      "record_hash": "2d63074b5bbed44f5abb491eb340e7d252590fed3f04157e2c1d8594e98bfcfd"
+    },
+    {
+      "event_id": 43,
+      "payload_hash": "e2abc0ed542c42dbac4c5dcaad5ce97372aefaee2cb8b964ef450f194ead4b65",
+      "position": 43,
+      "prev_proof": "c481c6a8f8b7af5338b6fa6241fa1754ead18abcfe6433b8711489bf9c930b4d",
+      "proof": "a8eb2816d1368cba1e5ff5001840575d9448db23ffedbca04f273f2577059c29",
+      "record_hash": "36d347614aca3da4be0d7d29952178e1a8d1d03feef82279b1115ab5a9a65c8a"
+    },
+    {
+      "event_id": 44,
+      "payload_hash": "d149300c3bb5c35fdc2037a094d209aa61f3ec6eb93e968ca9c46ae2b097a9dd",
+      "position": 44,
+      "prev_proof": "a8eb2816d1368cba1e5ff5001840575d9448db23ffedbca04f273f2577059c29",
+      "proof": "031a08ecd856bcca27cbbc045472d1d0cc3c6b4357c5d9c037e4097498dc9cb9",
+      "record_hash": "7ca5825803cc8b30ef76884b66d269b152102ad63c365a29006343b13ad6887b"
+    },
+    {
+      "event_id": 45,
+      "payload_hash": "e7b5ec4f46cb1ee025d6b5bb4bf86f154e7514a7820d48f96736c777b6919ae1",
+      "position": 45,
+      "prev_proof": "031a08ecd856bcca27cbbc045472d1d0cc3c6b4357c5d9c037e4097498dc9cb9",
+      "proof": "f55055190698527673496700f123766aad240f5d87649dd78dd8068f65613960",
+      "record_hash": "7e9243e7e34107c7da8c1f9bacc2496053563e8e680580c994bcff146574b22f"
+    },
+    {
+      "event_id": 46,
+      "payload_hash": "80bcc6f1c6149e351724e13032333c7a26999dc65086699ec3ac7d7386881170",
+      "position": 46,
+      "prev_proof": "f55055190698527673496700f123766aad240f5d87649dd78dd8068f65613960",
+      "proof": "957d133d5cb1d53b7733713b48992e882192ab8b004dc9789fcd62eb98571ca3",
+      "record_hash": "aff8b3fa1167afcb69857c1adf00c11955f4b8090e9e0ea66a2740475184855d"
+    },
+    {
+      "event_id": 47,
+      "payload_hash": "fdb639bad44c6473ccefa7f736f4cf809fe73456fad05fabf91363ca7d50e0f1",
+      "position": 47,
+      "prev_proof": "957d133d5cb1d53b7733713b48992e882192ab8b004dc9789fcd62eb98571ca3",
+      "proof": "4ea101a076bd32fe03949a7a9bb59908afbedcd8acf42e26c715157c16426c99",
+      "record_hash": "f11b19093279a4261669336e0cf721a9742df04aa4fbd94896707af5e2593bdd"
+    },
+    {
+      "event_id": 48,
+      "payload_hash": "045b5c13f815792635344415f59dbd6d31e92a0a6c6bbbcd7282e122fe898197",
+      "position": 48,
+      "prev_proof": "4ea101a076bd32fe03949a7a9bb59908afbedcd8acf42e26c715157c16426c99",
+      "proof": "6be9a3a59a3167009fc771af30ecfba348b1130441296d95ddb4e2d74be47f89",
+      "record_hash": "c10d7b5400bb4b9776d6ec648b7a021c054fd2f322aa2e19d6d5c018ff40896b"
+    },
+    {
+      "event_id": 49,
+      "payload_hash": "ad64c349f6193cfd47165c5e9b8aef69aa2c397aca0aa9982e6a063568af0151",
+      "position": 49,
+      "prev_proof": "6be9a3a59a3167009fc771af30ecfba348b1130441296d95ddb4e2d74be47f89",
+      "proof": "18a8c21b3564c98fce73dbb2891efc71f95c83f4ebc69c33ab0517aaf253b198",
+      "record_hash": "417622f6103548483fe0590431e8438d11e4e120f601c6eaacec7e91a623d71e"
+    },
+    {
+      "event_id": 50,
+      "payload_hash": "e45744020500e035cdb16f090c0fdcd0e302b7bf2739f2178da2e9df3884af3c",
+      "position": 50,
+      "prev_proof": "18a8c21b3564c98fce73dbb2891efc71f95c83f4ebc69c33ab0517aaf253b198",
+      "proof": "ffe8b1557ee3a5a0d9963bc9f0ba116ca21c041005d9b5e84ce370502996186f",
+      "record_hash": "d03316115b3e6400c2c45e5e279b9125ed890945043c8b2f7bb88c936f7f5433"
+    },
+    {
+      "event_id": 51,
+      "payload_hash": "3d980e5ab1bedb6dce084108035288cef11229b271ac5efff485812c5c63cd2d",
+      "position": 51,
+      "prev_proof": "ffe8b1557ee3a5a0d9963bc9f0ba116ca21c041005d9b5e84ce370502996186f",
+      "proof": "a73382d51fa1d1f69888278da3725ecababda42ca785eea584480fadc9b95e0c",
+      "record_hash": "2ce2c5140cd28ce52972bf84c9a90dcf30603d0bc27095c754ed52b73f498380"
+    },
+    {
+      "event_id": 52,
+      "payload_hash": "4634c81641c2ec66058474ffba1684a55aa3570e967cd56b9f04209e9abcb965",
+      "position": 52,
+      "prev_proof": "a73382d51fa1d1f69888278da3725ecababda42ca785eea584480fadc9b95e0c",
+      "proof": "ecdddaecc881d0a124ca04c857f9dd4f9d415e87439423109c273c4e85bd606d",
+      "record_hash": "0cff7b4a3c32dbeaa723eb22ece34e5ea019292d03bc0f66e135c3d74dbd5067"
+    },
+    {
+      "event_id": 53,
+      "payload_hash": "1147c5404bca4fb0960896d403bbe2c4a8260131a6e1d76f2501ab8829177d3f",
+      "position": 53,
+      "prev_proof": "ecdddaecc881d0a124ca04c857f9dd4f9d415e87439423109c273c4e85bd606d",
+      "proof": "2b6696c739c8d372f6da5233ea561cf7b674bf220ff569636cc29a0d5936882f",
+      "record_hash": "16baabc0d9d314f84fd6df51e87401d4a3ed47386144ff11a665fca1b74d4678"
+    },
+    {
+      "event_id": 54,
+      "payload_hash": "d2a7a492983c811cc8a7588dee686660508f70747f87ad74f5ebf0843091e139",
+      "position": 54,
+      "prev_proof": "2b6696c739c8d372f6da5233ea561cf7b674bf220ff569636cc29a0d5936882f",
+      "proof": "1664aeecea145d6a567f5c73f4c1bd4e5f45717b5efb26f8687b64d6ffe19330",
+      "record_hash": "61c88aa4d00b48c31e3a6772d9e612ed367592a5b9be8ba09dee5bc413f64a21"
+    },
+    {
+      "event_id": 55,
+      "payload_hash": "093c4f2e8ffd8f6caaef33aaa3e49aed62b9963b0d62a46d6fa835ff6d43b04e",
+      "position": 55,
+      "prev_proof": "1664aeecea145d6a567f5c73f4c1bd4e5f45717b5efb26f8687b64d6ffe19330",
+      "proof": "79b939cf91b8b102dd66e0a1137a94311bcc9e2493043b0eabe1c83712ffb1b8",
+      "record_hash": "6ef961a381bef04b89de93e14b9c043d05d8531df8082c6c7dc8c101a5062c19"
+    },
+    {
+      "event_id": 56,
+      "payload_hash": "883348cfb2d5170ee94ae2d12238368f7084489b121e9d59ee3bdf0c620b54f1",
+      "position": 56,
+      "prev_proof": "79b939cf91b8b102dd66e0a1137a94311bcc9e2493043b0eabe1c83712ffb1b8",
+      "proof": "3f2b0a07061c856937e0f47e6304e1b98902832b97b12a66f117bf360da40640",
+      "record_hash": "bb552e05d35cb325ce5b3b8a4ebb3db4239a9b96caf5aeea5f977a28863ec58b"
+    },
+    {
+      "event_id": 57,
+      "payload_hash": "56361fc6f75ef74d907dbf50972b180b4479c4a69bc1264c5302dd9e6952201d",
+      "position": 57,
+      "prev_proof": "3f2b0a07061c856937e0f47e6304e1b98902832b97b12a66f117bf360da40640",
+      "proof": "90d5e3d2d89139b236f6acfc1699a5d2ee0a530df608e4d6e73cd143359c59db",
+      "record_hash": "b91f9f6ea5eea47622a78813db64d670a42ae2cf43f26b741c5e17e7cd0f054c"
+    },
+    {
+      "event_id": 58,
+      "payload_hash": "d5533051ceeb9b2a98cbe8ec27ba61191766f8f788eb47700d136d420a050746",
+      "position": 58,
+      "prev_proof": "90d5e3d2d89139b236f6acfc1699a5d2ee0a530df608e4d6e73cd143359c59db",
+      "proof": "5bc8a17953016ef24b6c36ca7e17ef20d95183eb2bb8c30de500f398e6a7bbec",
+      "record_hash": "c6ec9b4cc2f97c234c57a0f6e6785e0c7c78ee18ff1830c64cd9b39eef310136"
+    },
+    {
+      "event_id": 59,
+      "payload_hash": "8d9de20e3949c04039a5cd293efdefaf0513c532c4db90a0d35aa46193adaec1",
+      "position": 59,
+      "prev_proof": "5bc8a17953016ef24b6c36ca7e17ef20d95183eb2bb8c30de500f398e6a7bbec",
+      "proof": "0b038e1ced6f59db21c81ae9d015b63d12204394b3dcad31bb545ef40d878aa3",
+      "record_hash": "47d8c212249c6142efe2bd886a28ee17fee19386f98f4aaf2baedc5ca17fc2e1"
+    },
+    {
+      "event_id": 60,
+      "payload_hash": "9dd8a189917ffa97b01fc7f716b9602889df8f41b7be48f6783b5dc6709b0620",
+      "position": 60,
+      "prev_proof": "0b038e1ced6f59db21c81ae9d015b63d12204394b3dcad31bb545ef40d878aa3",
+      "proof": "fa7f2d3c241804294fa5291a50880be23c0447bffebb35941e50eddd8ab20025",
+      "record_hash": "c5370135bd30219e55d607bb7fa209c5dd0c2669db771535065bcfb4651ed656"
+    },
+    {
+      "event_id": 61,
+      "payload_hash": "fe32cb506d272441c564e7da97ccf8836b6f96c3a9fc51c0407e1e5a4a3a2af8",
+      "position": 61,
+      "prev_proof": "fa7f2d3c241804294fa5291a50880be23c0447bffebb35941e50eddd8ab20025",
+      "proof": "9ff407953418360e884e3f8aa79b9369843eeb757f7de36526db98f6d9034b64",
+      "record_hash": "a608f40ecda1a21031c0b7989ebe0692d61293399b7165a2b92eb366d02b7c53"
+    },
+    {
+      "event_id": 62,
+      "payload_hash": "6405987c19884184ba8091c511cc102ea6f61976d3c02424f7050edbc745f9b1",
+      "position": 62,
+      "prev_proof": "9ff407953418360e884e3f8aa79b9369843eeb757f7de36526db98f6d9034b64",
+      "proof": "d7c061609233536de140996421705a86659845c8c92c7b57526c8ff1ec937645",
+      "record_hash": "324007d8ec1900ef5e2416729f65a973339d79285dfcacb7b14db0092ff82481"
+    },
+    {
+      "event_id": 63,
+      "payload_hash": "cb3326d1a99613f4cac129ee1a105475208d6753ab2f0dd0aaf491ca1f28d82d",
+      "position": 63,
+      "prev_proof": "d7c061609233536de140996421705a86659845c8c92c7b57526c8ff1ec937645",
+      "proof": "9e46aea8247198cfc07b25cc753d4113342a8445ef5e65c9a522ac9fa5c5dde8",
+      "record_hash": "d157fb008c45f8d1050b3d335700a4642f4e0d209fe6f38e8dcb4c3e58ec6daf"
+    },
+    {
+      "event_id": 64,
+      "payload_hash": "fb38d79df3bd92bc114845e9ef9040cca00294b7cc430500e6eaca10679f3772",
+      "position": 64,
+      "prev_proof": "9e46aea8247198cfc07b25cc753d4113342a8445ef5e65c9a522ac9fa5c5dde8",
+      "proof": "cf951ff7f3755593cec6c7206cc35fa597e9819e4e3e2d1fe28eb2cd78501504",
+      "record_hash": "8b8452293bf56f4e75596b84cdabddca8b21f211d94510d67ac74066219cb7e4"
+    },
+    {
+      "event_id": 65,
+      "payload_hash": "a7e752a926c88272929dbfe72dd94b3b8922f8bcbd1e041ba6cbdbebf209a0b6",
+      "position": 65,
+      "prev_proof": "cf951ff7f3755593cec6c7206cc35fa597e9819e4e3e2d1fe28eb2cd78501504",
+      "proof": "2afc65465e1c5b1d7e27304fcfc790beda9341656cdb8cca3e20c79b6e9a9b90",
+      "record_hash": "7d00d42395cc26f918564d17e3224cc68156620d8d913941a02365353908c4e2"
+    },
+    {
+      "event_id": 66,
+      "payload_hash": "eb4eed46eed3c99e91f041ba9def22c1fac46820a669a6847d19765d9a35ece8",
+      "position": 66,
+      "prev_proof": "2afc65465e1c5b1d7e27304fcfc790beda9341656cdb8cca3e20c79b6e9a9b90",
+      "proof": "5dd0fd354d169fe2f037e6c2987a584d7298f77df6ce4e2a6948b5b3de498fa1",
+      "record_hash": "a4440383fe4ddb8d885aeac4c14fddc1816ba6638720cecc5eb34efc87adb2aa"
+    },
+    {
+      "event_id": 67,
+      "payload_hash": "739d538812617ba0cd69155afd9f82f2848080decb0d91ecaaf9f3b8a058d557",
+      "position": 67,
+      "prev_proof": "5dd0fd354d169fe2f037e6c2987a584d7298f77df6ce4e2a6948b5b3de498fa1",
+      "proof": "8bf3d844375d0841e333b20a0fb38aa43414b937ae1c9274ac7c2e31606d4dd3",
+      "record_hash": "93a5d0691f773d7ef141605c689559b999ec62bf236df29ab94aabc32c97a857"
+    },
+    {
+      "event_id": 68,
+      "payload_hash": "e26b9d56d52ad2a23d95f6782d296c9d78c2aa240618c30d448895e588dc2605",
+      "position": 68,
+      "prev_proof": "8bf3d844375d0841e333b20a0fb38aa43414b937ae1c9274ac7c2e31606d4dd3",
+      "proof": "80dc8db2c10f57fad6a49fe854548cecc945c10ea132286b85badc3c29d1c2ee",
+      "record_hash": "a4d46c6de3bf4dbe801f21ef24d59c6ef692ef764390ba0e3a628bd8dd0f4e50"
+    },
+    {
+      "event_id": 69,
+      "payload_hash": "bac5f0a6033665973189b270cce294ece1713314e6afadf580ca74c3b472309c",
+      "position": 69,
+      "prev_proof": "80dc8db2c10f57fad6a49fe854548cecc945c10ea132286b85badc3c29d1c2ee",
+      "proof": "e6c28e2081a6f522f77ba3d213680d0f82751c87a01da973803372d7558082f9",
+      "record_hash": "8060b968303f1db2d177c99bda621ef4a99614b75ba2a9b399a82c56cd8cb092"
+    },
+    {
+      "event_id": 70,
+      "payload_hash": "742e131acf9b8f4269189c060ef3e9b11158b194b6c814c4d2d9c0615d592a1d",
+      "position": 70,
+      "prev_proof": "e6c28e2081a6f522f77ba3d213680d0f82751c87a01da973803372d7558082f9",
+      "proof": "7926a7e4b99c36b365f3ab550a89d7ec1a3cbf8147dce81c784c287f1e901820",
+      "record_hash": "40b64c3394da8edb7286703a6526955b4d97985162ff7f6cf403b7b04453d7a5"
+    },
+    {
+      "event_id": 71,
+      "payload_hash": "3ee9763b491e767434a76e8da5d4bf4f7bdfc6d84b032f206851cf0a613c3097",
+      "position": 71,
+      "prev_proof": "7926a7e4b99c36b365f3ab550a89d7ec1a3cbf8147dce81c784c287f1e901820",
+      "proof": "3a8e338e23b5ad66d8df474d7d5cb294ae760e94f0f2c6b65e737b90cc2ac119",
+      "record_hash": "e0f36cea1420a67b4c82697707f541909b07fb372ab2c51ea2396a6e18fd3bcd"
+    },
+    {
+      "event_id": 72,
+      "payload_hash": "cb8a4e43365a371fffe362a15e10961a2056e75d5c6e82d94181f35d36e85414",
+      "position": 72,
+      "prev_proof": "3a8e338e23b5ad66d8df474d7d5cb294ae760e94f0f2c6b65e737b90cc2ac119",
+      "proof": "bdf0fe43eacbc07ecd025061b9be49d4d816219ffeed7d0f6f743d47ff8df958",
+      "record_hash": "788338e8378c13a7b76c30eff86eb2f4835c5fcdcd1b1a9abcea714a1980333b"
+    },
+    {
+      "event_id": 73,
+      "payload_hash": "d53f96230aed17c96050a861a07a8bffbf1e4c01b2efe1788af562588d982509",
+      "position": 73,
+      "prev_proof": "bdf0fe43eacbc07ecd025061b9be49d4d816219ffeed7d0f6f743d47ff8df958",
+      "proof": "3a8c3363f0c66b2afae24fd859d1887727bfb7d4c64d28b71a7f35309afc6253",
+      "record_hash": "c8ea367f893a557e414f506a71fc3c201d174cf77d684c9897fac71138ddcc05"
+    },
+    {
+      "event_id": 74,
+      "payload_hash": "ab4c6bcc85e44ed0a89c61e23137f6f86386f84659bfaf36b23c0537fae2785e",
+      "position": 74,
+      "prev_proof": "3a8c3363f0c66b2afae24fd859d1887727bfb7d4c64d28b71a7f35309afc6253",
+      "proof": "5fccf6e6185cfb4d078e10d732c994be3d9525ec663bac414d10a431deb159b6",
+      "record_hash": "37d455b4ecb9427779829dd683d7cb85e877d9d20f0d0ec4574d99c776eb67a4"
+    },
+    {
+      "event_id": 75,
+      "payload_hash": "87e118d172ab6af71f994d4465220e4ff57f86c3c8e6b922806240b79c9a8a9f",
+      "position": 75,
+      "prev_proof": "5fccf6e6185cfb4d078e10d732c994be3d9525ec663bac414d10a431deb159b6",
+      "proof": "16d59878d6c4f9f670e86b560dfb98ac4739f7b71a510499099c6d9a183b9083",
+      "record_hash": "edd0e7f4b462cf1244cc9516b7fca830af6b18d91ae0630058b320d69b03b10e"
+    },
+    {
+      "event_id": 76,
+      "payload_hash": "02cb74a08315278d2a432e17b8a6d38cce907b0cf5bca54c2e03dcf89561a7a3",
+      "position": 76,
+      "prev_proof": "16d59878d6c4f9f670e86b560dfb98ac4739f7b71a510499099c6d9a183b9083",
+      "proof": "958fe33f75ecf1e23dce24cfd7abc8084800a322664b6011922c782c7ccbb2f8",
+      "record_hash": "fbb14a61b33ad1dabc9a05ecfa4e884e83f34ac1a38ae74b1d7e590dd41eda03"
+    },
+    {
+      "event_id": 77,
+      "payload_hash": "651fb5f23dc22cdae16405a40d9e233bfd9a83e1ef9589f1d3eb477fcc1c07a0",
+      "position": 77,
+      "prev_proof": "958fe33f75ecf1e23dce24cfd7abc8084800a322664b6011922c782c7ccbb2f8",
+      "proof": "862633bb455ad3a6e9ffef60f2b715da1646c37059eab55ea33f845516968748",
+      "record_hash": "1a2933a0fa712f6efd54129211267ea660a71974e213c00c489ad4b1e1129fa1"
+    },
+    {
+      "event_id": 78,
+      "payload_hash": "869b648b4882d60c007998096fc587fa2a61c91787d0a63b43d9372a1880ef4d",
+      "position": 78,
+      "prev_proof": "862633bb455ad3a6e9ffef60f2b715da1646c37059eab55ea33f845516968748",
+      "proof": "7d1998227e6d1055379b666224cc949fd23c289965ac8974d71f4f295daaf2d9",
+      "record_hash": "f7af1fcaf5d709a3fb5a1bb426b585327ed19dc78d2aea42ab7c1430a55462c6"
+    },
+    {
+      "event_id": 79,
+      "payload_hash": "73390762f0b0f6c925d747d0e679ac04a4db5a50da6213b2820d9eb8dc0240ca",
+      "position": 79,
+      "prev_proof": "7d1998227e6d1055379b666224cc949fd23c289965ac8974d71f4f295daaf2d9",
+      "proof": "aec514f8d5158ad4d946924d8b663407cf91daa60df53fced434b880e908a887",
+      "record_hash": "b40dd1ebc2f8aa7bae659e7857cbec52b962630b45cbd6aac933b2c612b96d82"
+    },
+    {
+      "event_id": 80,
+      "payload_hash": "92febded3c4f067cde188956aa071b380f92750ad59709598c0b75d3db4f0723",
+      "position": 80,
+      "prev_proof": "aec514f8d5158ad4d946924d8b663407cf91daa60df53fced434b880e908a887",
+      "proof": "db98c7086488efdf1d8aa605ade4bb1aa7cc3a90b3c0de286e748e094410601e",
+      "record_hash": "f31f0f33358b4191cf8f6073bbd6985c94e8e27db28154648f108b4b963e2e09"
+    },
+    {
+      "event_id": 81,
+      "payload_hash": "a551aa077ad4101c2ff56c94aa309ea6bf209593526932d1b663618034db6c21",
+      "position": 81,
+      "prev_proof": "db98c7086488efdf1d8aa605ade4bb1aa7cc3a90b3c0de286e748e094410601e",
+      "proof": "3b3a7c1f82543303af7f20530a2f428b3e4084681d65e8e76e4255b16bfd46e1",
+      "record_hash": "293c86de7ec95f470d70540cadbd2af6cd55e60347eb0ebd68bf906f24c23f61"
+    },
+    {
+      "event_id": 82,
+      "payload_hash": "db861a431ea24c2ea80e2e4b80ecd85a0f25f58c10d80dddd1977a1bca17ad92",
+      "position": 82,
+      "prev_proof": "3b3a7c1f82543303af7f20530a2f428b3e4084681d65e8e76e4255b16bfd46e1",
+      "proof": "63ed0836a9ad2d52656962ca74cf5915b81c4206018fb6d43821faae81fc81bf",
+      "record_hash": "1cee83a85111a463f7c791e629cd83206442681356ccd7297d5f9b17385fe47a"
+    },
+    {
+      "event_id": 83,
+      "payload_hash": "36b870013403413c943d517ff3f110e88643ad08c2045333f143582961d1a850",
+      "position": 83,
+      "prev_proof": "63ed0836a9ad2d52656962ca74cf5915b81c4206018fb6d43821faae81fc81bf",
+      "proof": "eb82ac44872d6518060e44d4968301df8772231b763d0c8a1496f802a8b535f4",
+      "record_hash": "46546392922f52e88f97f6eea08382ce8a0228b2e431b1f39fe6b90091847e54"
+    },
+    {
+      "event_id": 84,
+      "payload_hash": "ed13f0ef1a2697777137fa00b09e4226f14d5cb55388b44ac9625655e9941767",
+      "position": 84,
+      "prev_proof": "eb82ac44872d6518060e44d4968301df8772231b763d0c8a1496f802a8b535f4",
+      "proof": "1ccc2d26c38b98173fd711108977775773a459252ebc1bb4e8ef9b0c520d0645",
+      "record_hash": "7db609abe13be2c8ea8c45ebbf8041b80767b66bedd8bc24debacb9a2cf6824b"
+    },
+    {
+      "event_id": 85,
+      "payload_hash": "a4801df52f34e96f61122a04890f6e708c316ead1d09a052f86abd43a77a0ce9",
+      "position": 85,
+      "prev_proof": "1ccc2d26c38b98173fd711108977775773a459252ebc1bb4e8ef9b0c520d0645",
+      "proof": "6a37d9066bd9f36e39459296886ba99a903d1025daec53cf52aaa2bfe601b3ed",
+      "record_hash": "999a75362b3c8dfc73241723eed1257679773700ede6249b75f920b1ed5b2d75"
+    },
+    {
+      "event_id": 86,
+      "payload_hash": "6957d9fe2cad0d18597672a5bc7da0cbf585eb47ae19bd906b4d2220f85f6dbc",
+      "position": 86,
+      "prev_proof": "6a37d9066bd9f36e39459296886ba99a903d1025daec53cf52aaa2bfe601b3ed",
+      "proof": "ad16108bba3f27d0dd8593fb4f72f205d58753520776c806e169c722978a1c36",
+      "record_hash": "8d9d4ca99057fe5df486d9dc270024a7ff7c61361627ae5cb80048d02ac37d2e"
+    },
+    {
+      "event_id": 87,
+      "payload_hash": "aabaffbe16138e5a23e030e5bb19d177062a62e32bc34a3628092bb63edb70c2",
+      "position": 87,
+      "prev_proof": "ad16108bba3f27d0dd8593fb4f72f205d58753520776c806e169c722978a1c36",
+      "proof": "1b8a3c02ccbffd60546aae71521737aebeb525312e48b94980cef2a1e754c49e",
+      "record_hash": "b799a7b6a696025da9b6cd42923fa800c210af1348f6da5106259ae6235e20f4"
+    },
+    {
+      "event_id": 88,
+      "payload_hash": "a152f7e80fe34322f07853a0a6ee595fc1e4a1f62c3b7c5fe4d2b0a3ef4a76a3",
+      "position": 88,
+      "prev_proof": "1b8a3c02ccbffd60546aae71521737aebeb525312e48b94980cef2a1e754c49e",
+      "proof": "608b2c6d7c9b97a98e8434a6c4b9fa3857691ae526fb2c1a73f317ef768e6b85",
+      "record_hash": "69353e3236f1858ec485d0ecfb67eaeef7c4fe6ba2df88af5fc8f004f15d8de8"
+    },
+    {
+      "event_id": 89,
+      "payload_hash": "fbbdcd13440d8e4cb743298f8e3aeef9a772c0c48fa2e784c8112b43f2b5eeb1",
+      "position": 89,
+      "prev_proof": "608b2c6d7c9b97a98e8434a6c4b9fa3857691ae526fb2c1a73f317ef768e6b85",
+      "proof": "ed50dcfa58f8b3c5b82e0772030acff1bdd7bb58133cf7d750eaafba39b76cf4",
+      "record_hash": "44b3df8ddbd05da9e32ef96b5e1cabf551d2f2ff9a186e4f8a08148fab7dfe85"
+    },
+    {
+      "event_id": 90,
+      "payload_hash": "06a2748f9e8e8d51e079b03208dcbbb5c159681e2697f922887378a834c1737f",
+      "position": 90,
+      "prev_proof": "ed50dcfa58f8b3c5b82e0772030acff1bdd7bb58133cf7d750eaafba39b76cf4",
+      "proof": "a658ad0b3226bf6e8a3ec6ed49c0089272cf84da7443daaa7e243de3484d7b8a",
+      "record_hash": "5f1eb9d26ea5b3dd19f5f8e340da3611652a61fbd70d8008c3b31d78caecfb59"
+    }
+  ]
+}
